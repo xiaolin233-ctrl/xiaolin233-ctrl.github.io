@@ -1,240 +1,145 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberFile - 蓝牙极速传</title>
+    <title>蓝牙文件传输</title>
     <style>
-        :root {
-            --neon-blue: #00f3ff;
-            --cyber-purple: #6a00ff;
-            --dark-bg: #0f0f1a;
-        }
-
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-
-        body {
-            margin: 0;
-            background: var(--dark-bg);
-            color: #fff;
-            line-height: 1.6;
-            min-height: 100vh;
-            background-image: 
-                linear-gradient(
-                    45deg,
-                    rgba(106, 0, 255, 0.1) 25%,
-                    transparent 25%,
-                    transparent 75%,
-                    rgba(106, 0, 255, 0.1) 75%
-                ),
-                linear-gradient(
-                    45deg,
-                    rgba(106, 0, 255, 0.1) 25%,
-                    transparent 25%,
-                    transparent 75%,
-                    rgba(106, 0, 255, 0.1) 75%
-                );
-            background-size: 40px 40px;
-            background-position: 0 0, 20px 20px;
-        }
-
-        .container {
-            max-width: 100%;
-            padding: 20px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 2.2rem;
-            text-shadow: 0 0 10px var(--neon-blue);
-            margin: 30px 0;
-            position: relative;
-        }
-
-        h1::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
-        }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-        .custom-upload {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid var(--neon-blue);
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-
-        .custom-upload:hover {
-            background: rgba(0, 243, 255, 0.1);
-            box-shadow: 0 0 15px var(--neon-blue);
-        }
-
-        button {
-            background: linear-gradient(135deg, var(--cyber-purple), var(--neon-blue));
-            border: none;
-            padding: 15px 25px;
-            color: white;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        #status {
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            text-align: center;
-            border: 2px solid;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(5px);
-        }
-
-        .connected {
-            border-color: #00ff88;
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
-        }
-
-        .disconnected {
-            border-color: #ff0033;
-            box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
-        }
-
-        progress {
-            width: 100%;
-            height: 12px;
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            margin: 20px 0;
-            border: none;
-        }
-
-        progress::-webkit-progress-bar {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 6px;
-        }
-
-        progress::-webkit-progress-value {
-            background: linear-gradient(90deg, var(--cyber-purple), var(--neon-blue));
-            border-radius: 6px;
-            box-shadow: 0 0 10px var(--neon-blue);
-        }
-
-        #receivedFiles {
-            margin-top: 30px;
-        }
-
-        .download-link {
-            display: block;
-            padding: 10px;
-            color: var(--neon-blue);
-            text-decoration: none;
-            border: 1px solid;
-            border-radius: 6px;
-            margin: 10px 0;
-            transition: all 0.3s ease;
-        }
-
-        .download-link:hover {
-            background: rgba(0, 243, 255, 0.1);
-        }
-
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            button {
-                width: 100%;
-                padding: 18px;
-            }
-            
-            .custom-upload {
-                padding: 20px;
-            }
-        }
-
-        /* 连接动画 */
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-        
-        .connecting {
-            animation: pulse 1.5s infinite;
-        }
+        .container { max-width: 600px; margin: 20px auto; padding: 20px; }
+        .status { margin: 10px 0; padding: 10px; background: #f0f0f0; }
+        #progress { width: 100%; height: 20px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>⚡CYBER TRANSFER</h1>
+        <h1>蓝牙文件传输</h1>
         
-        <div class="control-group">
-            <label class="custom-upload">
-                📁 选择传输文件
-                <input type="file" id="fileInput">
-            </label>
-            <button id="connectBtn">📶 连接设备</button>
-            <button id="sendBtn" disabled>🚀 开始传输</button>
+        <button id="connectBtn">连接设备</button>
+        <button id="sendBtn" disabled>发送文件</button>
+        <input type="file" id="fileInput" disabled>
+        
+        <div class="status">
+            状态: <span id="status">等待连接...</span>
+            <progress id="progress" value="0" max="100"></progress>
         </div>
-
-        <div id="status" class="disconnected">设备未连接</div>
-        <progress id="progress" value="0" max="100" hidden></progress>
-        <div id="receivedFiles"></div>
     </div>
 
     <script>
-        // 保持原有JavaScript逻辑不变，仅更新状态提示部分
-        function updateStatus(message) {
-            const statusDiv = document.getElementById('status');
-            statusDiv.textContent = message;
+        const SERVICE_UUID = '0000ff01-0000-1000-8000-00805f9b34fb';
+        const CHARACTERISTIC_UUID = '0000ff02-0000-1000-8000-00805f9b34fb';
+
+        let device;
+        let characteristic;
+        let fileChunks = [];
+        let currentChunk = 0;
+        const CHUNK_SIZE = 512; // 根据蓝牙MTU调整
+
+        // 连接蓝牙设备
+        document.getElementById('connectBtn').addEventListener('click', async () => {
+            try {
+                device = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: [SERVICE_UUID]
+                });
+
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService(SERVICE_UUID);
+                characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+                
+                enableUI();
+                updateStatus("已连接");
+                
+                // 开始监听接收数据
+                characteristic.startNotifications();
+                characteristic.addEventListener('characteristicvaluechanged', handleReceivedData);
+                
+            } catch (error) {
+                updateStatus(`连接失败: ${error}`);
+            }
+        });
+
+        // 处理接收数据
+        function handleReceivedData(event) {
+            const value = event.target.value;
+            const data = new TextDecoder().decode(value);
             
-            if (message.includes('连接中')) {
-                statusDiv.className = 'connecting';
-            } else {
-                statusDiv.className = device?.gatt.connected ? 'connected' : 'disconnected';
+            if (data.startsWith('META:')) {
+                const meta = JSON.parse(data.slice(5));
+                fileChunks = new Array(Math.ceil(meta.size / CHUNK_SIZE));
+                updateStatus(`接收文件: ${meta.name} (${meta.size}字节)`);
+            } else if (data.startsWith('CHUNK:')) {
+                const [index, chunk] = JSON.parse(data.slice(6));
+                fileChunks[index] = chunk;
+                currentChunk++;
+                
+                const progress = (currentChunk / fileChunks.length * 100).toFixed(1);
+                document.getElementById('progress').value = progress;
+                
+                if (currentChunk === fileChunks.length) {
+                    saveFile(fileChunks);
+                    fileChunks = [];
+                    currentChunk = 0;
+                }
             }
         }
 
-        // 其他JavaScript代码保持不变...
-        // 此处保留原始蓝牙功能代码，确保功能正常运作
+        // 发送文件
+        document.getElementById('sendBtn').addEventListener('click', async () => {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) return;
+
+            try {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const buffer = e.target.result;
+                    const chunks = [];
+                    
+                    // 发送元数据
+                    const meta = {
+                        name: file.name,
+                        type: file.type,
+                        size: file.size
+                    };
+                    await characteristic.writeValue(new TextEncoder().encode(`META:${JSON.stringify(meta)}`));
+
+                    // 分块发送
+                    for (let i = 0; i < file.size; i += CHUNK_SIZE) {
+                        const chunk = buffer.slice(i, i + CHUNK_SIZE);
+                        await characteristic.writeValue(
+                            new TextEncoder().encode(`CHUNK:${JSON.stringify([chunks.length, chunk])}`)
+                        );
+                        document.getElementById('progress').value = (i / file.size * 100).toFixed(1);
+                    }
+                    
+                    updateStatus("文件发送完成");
+                };
+                reader.readAsArrayBuffer(file);
+                
+            } catch (error) {
+                updateStatus(`发送失败: ${error}`);
+            }
+        });
+
+        // 保存接收的文件
+        function saveFile(chunks) {
+            const blob = new Blob(chunks, { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `received_${Date.now()}`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            updateStatus("文件接收完成");
+        }
+
+        function enableUI() {
+            document.getElementById('sendBtn').disabled = false;
+            document.getElementById('fileInput').disabled = false;
+        }
+
+        function updateStatus(text) {
+            document.getElementById('status').textContent = text;
+        }
     </script>
 </body>
 </html>
