@@ -1,13 +1,205 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>蓝牙文件传输</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的技术博客 | 探索与分享</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --text-color: #333;
+            --bg-color: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            transition: all 0.3s ease;
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            background: var(--primary-color);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: var(--secondary-color);
+        }
+
+        /* 主要内容区域 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 2rem;
+        }
+
+        /* 文章列表 */
+        .article-card {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .article-card h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .article-meta {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            height: fit-content;
+        }
+
+        .widget {
+            margin-bottom: 2rem;
+        }
+
+        /* 暗黑模式切换 */
+        .theme-switch {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: none;
+            color: white;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
-    <button id="connectBtn">连接设备</button>
-    <input type="file" id="fileInput" />
-    <button id="sendBtn">发送文件</button>
-    <div id="status"></div>
-    <script src="main.js"></script>
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="#home">首页</a>
+            <a href="#articles">文章</a>
+            <a href="#about">关于</a>
+            <a href="#contact">联系</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="content">
+            <article class="article-card">
+                <h2>深入理解JavaScript闭包</h2>
+                <div class="article-meta">
+                    <span>作者：技术达人</span> | 
+                    <time datetime="2023-07-20">2023年7月20日</time> | 
+                    <span>分类：前端开发</span>
+                </div>
+                <p>闭包是JavaScript中最重要的概念之一，它允许函数访问并记住其词法作用域外的变量...（摘要内容）</p>
+                <a href="#" class="read-more">阅读全文 →</a>
+            </article>
+
+            <article class="article-card">
+                <h2>CSS Grid布局完全指南</h2>
+                <div class="article-meta">
+                    <span>作者：技术达人</span> | 
+                    <time datetime="2023-07-18">2023年7月18日</time> | 
+                    <span>分类：CSS</span>
+                </div>
+                <p>在现代网页布局中，CSS Grid布局提供了前所未有的灵活性和控制能力...（摘要内容）</p>
+                <a href="#" class="read-more">阅读全文 →</a>
+            </article>
+        </div>
+
+        <aside class="sidebar">
+            <div class="widget">
+                <h3>关于我</h3>
+                <p>全栈开发者，热爱技术分享。专注于Web开发、JavaScript生态和前沿技术。</p>
+            </div>
+            
+            <div class="widget">
+                <h3>分类目录</h3>
+                <ul>
+                    <li><a href="#">前端开发</a></li>
+                    <li><a href="#">后端技术</a></li>
+                    <li><a href="#">DevOps</a></li>
+                    <li><a href="#">技术思考</a></li>
+                </ul>
+            </div>
+        </aside>
+    </main>
+
+    <button class="theme-switch" onclick="toggleTheme()">🌓</button>
+
+    <script>
+        // 暗黑模式切换
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            
+            if (document.body.classList.contains('dark-theme')) {
+                document.documentElement.style.setProperty('--bg-color', '#1a1a1a');
+                document.documentElement.style.setProperty('--text-color', '#ffffff');
+            } else {
+                document.documentElement.style.setProperty('--bg-color', '#ffffff');
+                document.documentElement.style.setProperty('--text-color', '#333');
+            }
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
 </body>
 </html>
