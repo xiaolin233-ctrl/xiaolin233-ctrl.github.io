@@ -5,400 +5,371 @@
     <title>专业图片处理器</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        :root {
+            --primary-color: #007bff;
+            --hover-color: #0056b3;
+        }
+
         body {
-            margin: 20px auto;
-            padding: 20px;
-            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f8f9fa;
+        }
+
+        .container {
             max-width: 1000px;
+            margin: 0 auto;
         }
 
         #previewCanvas {
-            max-width: 100%;
+            width: 100%;
+            max-width: 600px;
             height: auto;
-            margin: 20px 0;
-            border: 2px solid #ddd;
+            margin: 15px 0;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            image-rendering: -webkit-optimize-contrast;
         }
 
         .control-group {
-            margin: 20px 0;
+            margin: 15px 0;
             padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 8px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .slider-container {
-            margin: 10px 0;
-            display: flex;
+            margin: 12px 0;
+            display: grid;
+            grid-template-columns: 80px 1fr 70px;
             align-items: center;
             gap: 10px;
         }
 
         .filter-btns {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             gap: 8px;
         }
 
         .filter-btn {
-            padding: 8px 12px;
-            background: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 8px;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
             cursor: pointer;
-            white-space: nowrap;
             transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary-color);
         }
 
         .filter-btn.active {
-            background: #007bff;
+            background: var(--primary-color);
             color: white;
-            border-color: #0062cc;
+            border-color: var(--primary-color);
         }
 
         input[type="range"] {
-            flex-grow: 1;
-            min-width: 150px;
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
         }
 
-        .value-display {
-            width: 60px;
-            text-align: right;
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        input[type="range"]:active::-webkit-slider-thumb {
+            background: var(--hover-color);
         }
 
         #saveBtn {
-            padding: 12px 24px;
-            background: #28a745;
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
+            font-size: 16px;
             cursor: pointer;
-            margin-top: 20px;
-            width: 100%;
+            transition: background 0.2s;
+        }
+
+        #saveBtn:active {
+            background: var(--hover-color);
         }
 
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
-                margin: 10px;
-            }
-
-            .control-group {
-                margin: 10px 0;
-                padding: 10px;
-            }
-
             .slider-container {
-                flex-direction: column;
-                align-items: flex-start;
+                grid-template-columns: 60px 1fr 50px;
             }
-
-            input[type="range"] {
-                width: 100%;
-            }
-
-            .filter-btns {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
+            
             .filter-btn {
-                padding: 6px 10px;
-                font-size: 14px;
-            }
-
-            #saveBtn {
-                padding: 10px 20px;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .filter-btns {
-                grid-template-columns: repeat(4, 1fr);
+                font-size: 13px;
+                padding: 6px;
             }
         }
     </style>
 </head>
 <body>
-    <h1>专业图片处理器</h1>
-    
-    <input type="file" id="upload" accept="image/*">
-    <canvas id="previewCanvas"></canvas>
-    
-    <div class="control-group">
-        <h3>调节类</h3>
-        <div class="slider-container">
-            <label>亮度:</label>
-            <input type="range" id="brightness" min="0" max="200" value="100">
-            <span class="value-display">100%</span>
+    <div class="container">
+        <h1>专业图片处理器</h1>
+        
+        <input type="file" id="upload" accept="image/*" style="margin-bottom:15px">
+        <canvas id="previewCanvas"></canvas>
+        
+        <div class="control-group">
+            <h3>基础调节</h3>
+            <div class="slider-container">
+                <label>亮度</label>
+                <input type="range" id="brightness" min="0" max="200" value="100">
+                <span class="value-display">100%</span>
+            </div>
+            <div class="slider-container">
+                <label>对比度</label>
+                <input type="range" id="contrast" min="0" max="200" value="100">
+                <span class="value-display">100%</span>
+            </div>
+            <div class="slider-container">
+                <label>饱和度</label>
+                <input type="range" id="saturation" min="0" max="200" value="100">
+                <span class="value-display">100%</span>
+            </div>
         </div>
-        <div class="slider-container">
-            <label>对比度:</label>
-            <input type="range" id="contrast" min="0" max="200" value="100">
-            <span class="value-display">100%</span>
-        </div>
-        <div class="slider-container">
-            <label>饱和度:</label>
-            <input type="range" id="saturation" min="0" max="200" value="100">
-            <span class="value-display">100%</span>
-        </div>
-        <div class="slider-container">
-            <label>色相:</label>
-            <input type="range" id="hue" min="0" max="360" value="0">
-            <span class="value-display">0°</span>
-        </div>
-        <div class="slider-container">
-            <label>曝光:</label>
-            <input type="range" id="exposure" min="0" max="200" value="100">
-            <span class="value-display">100%</span>
-        </div>
-        <div class="slider-container">
-            <label>高光:</label>
-            <input type="range" id="highlight" min="0" max="200" value="100">
-            <span class="value-display">100%</span>
-        </div>
-        <div class="slider-container">
-            <label>阴影:</label>
-            <input type="range" id="shadow" min="0" max="200" value="100">
-            <span class="value-display">100%</span>
-        </div>
-        <div class="slider-container">
-            <label>锐化:</label>
-            <input type="range" id="sharpen" min="0" max="200" value="100">
-            <span class="value-display">100%</span>
-        </div>
-    </div>
 
-    <div class="control-group">
-        <h3>滤镜类</h3>
-        <div class="filter-btns">
-            <button class="filter-btn" data-filter="vintage">怀旧棕</button>
-            <button class="filter-btn" data-filter="grayscale">黑白</button>
-            <button class="filter-btn" data-filter="cold">冷色调</button>
-            <button class="filter-btn" data-filter="warm">暖色调</button>
-            <button class="filter-btn" data-filter="invert">反色</button>
-            <button class="filter-btn" data-filter="dramatic">戏剧效果</button>
-            <button class="filter-btn" data-filter="cinematic">电影感</button>
-            <button class="filter-btn" data-filter="leicaVivid">徕卡鲜艳</button>
-            <button class="filter-btn" data-filter="filmGrain">胶片颗粒</button>
-            <button class="filter-btn" data-filter="reset">重置</button>
+        <div class="control-group">
+            <h3>高级调节</h3>
+            <div class="slider-container">
+                <label>色相</label>
+                <input type="range" id="hue" min="0" max="360" value="0">
+                <span class="value-display">0°</span>
+            </div>
+            <div class="slider-container">
+                <label>锐化</label>
+                <input type="range" id="sharpen" min="0" max="200" value="100">
+                <span class="value-display">100%</span>
+            </div>
+            <div class="slider-container">
+                <label>高光</label>
+                <input type="range" id="highlight" min="0" max="200" value="100">
+                <span class="value-display">100%</span>
+            </div>
+            <div class="slider-container">
+                <label>阴影</label>
+                <input type="range" id="shadow" min="0" max="200" value="100">
+                <span class="value-display">100%</span>
+            </div>
         </div>
-    </div>
 
-    <button id="saveBtn">保存图片</button>
+        <div class="control-group">
+            <h3>专业滤镜</h3>
+            <div class="filter-btns">
+                <button class="filter-btn" data-filter="leicaVivid">徕卡鲜艳</button>
+                <button class="filter-btn" data-filter="filmGrain">胶片颗粒</button>
+                <button class="filter-btn" data-filter="cinematic">电影色调</button>
+                <button class="filter-btn" data-filter="vintage">复古棕调</button>
+                <button class="filter-btn" data-filter="monochrome">黑白经典</button>
+                <button class="filter-btn" data-filter="reset">重置效果</button>
+            </div>
+        </div>
+
+        <button id="saveBtn">保存图片</button>
+    </div>
 
     <script>
+        // 配置参数
+        const config = {
+            maxSize: 2048,
+            quality: 0.8,
+            throttleDelay: 100
+        };
+
+        // DOM元素
         const canvas = document.getElementById('previewCanvas');
         const ctx = canvas.getContext('2d');
-        let originalImageData = null;
-        let backupImage = null;
-        let activeFilter = null;
-        
+        let sourceImage = null;
+        let isProcessing = false;
+
+        // 控件配置
         const controls = {
-            brightness: { element: document.getElementById('brightness'), display: document.querySelector('#brightness + .value-display') },
-            contrast: { element: document.getElementById('contrast'), display: document.querySelector('#contrast + .value-display') },
-            saturation: { element: document.getElementById('saturation'), display: document.querySelector('#saturation + .value-display') },
-            hue: { element: document.getElementById('hue'), display: document.querySelector('#hue + .value-display') },
-            exposure: { element: document.getElementById('exposure'), display: document.querySelector('#exposure + .value-display') },
-            highlight: { element: document.getElementById('highlight'), display: document.querySelector('#highlight + .value-display') },
-            shadow: { element: document.getElementById('shadow'), display: document.querySelector('#shadow + .value-display') },
-            sharpen: { element: document.getElementById('sharpen'), display: document.querySelector('#sharpen + .value-display') }
+            brightness: getControlConfig('brightness', 100),
+            contrast: getControlConfig('contrast', 100),
+            saturation: getControlConfig('saturation', 100),
+            hue: getControlConfig('hue', 0),
+            sharpen: getControlConfig('sharpen', 100),
+            highlight: getControlConfig('highlight', 100),
+            shadow: getControlConfig('shadow', 100)
         };
 
-        document.getElementById('upload').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            
-            reader.onload = function(event) {
-                backupImage = new Image();
-                backupImage.onload = () => {
-                    canvas.width = backupImage.width;
-                    canvas.height = backupImage.height;
-                    ctx.drawImage(backupImage, 0, 0);
-                    originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    resetAllFilters();
-                };
-                backupImage.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
-
-        Object.entries(controls).forEach(([key, control]) => {
-            control.element.addEventListener('input', function() {
-                control.display.textContent = key === 'hue' ? `${this.value}°` : `${this.value}%`;
-                applyFilters();
-            });
-        });
-
-        const filterPresets = {
-            vintage: { contrast: 120, saturation: 80, hue: 30 },
-            grayscale: { saturation: 0 },
-            cold: { hue: 200, saturation: 120 },
-            warm: { hue: 40, saturation: 150 },
-            invert: { brightness: 100, contrast: 100, saturation: 100 },
-            dramatic: { contrast: 150, saturation: 130, shadow: 80 },
-            cinematic: { brightness: 90, contrast: 130, saturation: 110 },
-            leicaVivid: { contrast: 130, saturation: 140, sharpen: 120, highlight: 90, shadow: 110 },
-            filmGrain: { contrast: 110, saturation: 90, sharpen: 80, brightness: 95 },
-            reset: () => resetAllFilters()
+        // 滤镜预设
+        const presets = {
+            leicaVivid: { contrast: 130, saturation: 140, sharpen: 120, highlight: 110 },
+            filmGrain: { contrast: 110, saturation: 90, sharpen: 130, shadow: 85 },
+            cinematic: { brightness: 90, contrast: 120, saturation: 110, hue: 350 },
+            vintage: { contrast: 115, saturation: 85, hue: 30, shadow: 90 },
+            monochrome: { saturation: 0, contrast: 110, sharpen: 120 }
         };
 
-        function resetAllFilters() {
-            Object.entries(controls).forEach(([key, control]) => {
-                const defaultValue = key === 'hue' ? 0 : 100;
-                control.element.value = defaultValue;
-                control.display.textContent = key === 'hue' ? `${defaultValue}°` : `${defaultValue}%`;
-            });
-            
-            if (backupImage) {
-                ctx.globalCompositeOperation = 'source-over';
-                ctx.drawImage(backupImage, 0, 0);
-                originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            }
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            activeFilter = null;
-            applyFilters();
+        // 初始化
+        init();
+
+        function init() {
+            initEventListeners();
+            initControls();
         }
 
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const filter = this.dataset.filter;
-                if (activeFilter === filter) return resetAllFilters();
-                
-                activeFilter = filter;
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-
-                if (filterPresets[filter]) {
-                    if (typeof filterPresets[filter] === 'function') {
-                        filterPresets[filter]();
-                    } else {
-                        resetAllFilters();
-                        Object.entries(filterPresets[filter]).forEach(([key, value]) => {
-                            if (controls[key]) {
-                                controls[key].element.value = value;
-                                controls[key].element.dispatchEvent(new Event('input'));
-                            }
-                        });
-                    }
-                }
+        function initEventListeners() {
+            // 文件上传
+            document.getElementById('upload').addEventListener('change', handleFileUpload);
+            
+            // 控件输入
+            Object.values(controls).forEach(control => {
+                control.element.addEventListener('input', throttle(() => {
+                    updateControlValue(control);
+                    applyFilters();
+                }, config.throttleDelay));
             });
-        });
 
-        document.getElementById('saveBtn').addEventListener('click', function() {
-            const link = document.createElement('a');
-            link.download = 'processed-image.png';
-            link.href = canvas.toDataURL();
-            link.click();
-        });
+            // 滤镜按钮
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => handleFilterClick(btn));
+            });
+
+            // 保存按钮
+            document.getElementById('saveBtn').addEventListener('click', saveImage);
+        }
+
+        function initControls() {
+            Object.values(controls).forEach(control => {
+                updateDisplay(control);
+            });
+        }
+
+        async function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                const img = await loadImage(file);
+                sourceImage = img;
+                canvas.width = img.width;
+                canvas.height = img.height;
+                applyFilters();
+            } catch (error) {
+                alert('图片加载失败: ' + error.message);
+            }
+        }
 
         function applyFilters() {
-            if (!originalImageData || !backupImage) return;
+            if (!sourceImage || isProcessing) return;
+            isProcessing = true;
 
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.drawImage(backupImage, 0, 0);
-            let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            let data = imageData.data;
+            ctx.drawImage(sourceImage, 0, 0);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
 
-            applyAdjustment(data, 'exposure', controls.exposure.element.value);
-            applyAdjustment(data, 'brightness', controls.brightness.element.value);
-            applyAdjustment(data, 'contrast', controls.contrast.element.value);
-            applyAdjustment(data, 'saturation', controls.saturation.element.value);
-            applyAdjustment(data, 'hue', controls.hue.element.value);
-            applyHighlightShadow(data, controls.highlight.element.value, controls.shadow.element.value);
-            applySharpen(data, imageData.width, imageData.height, controls.sharpen.element.value);
+            applyAdjustments(data);
+            applySharpen(data, imageData.width, imageData.height);
 
             ctx.putImageData(imageData, 0, 0);
+            isProcessing = false;
         }
 
-        function applyAdjustment(data, type, value) {
-            value = parseFloat(value);
-            switch(type) {
-                case 'brightness':
-                    const brightness = (value - 100) * 2.55;
-                    for (let i = 0; i < data.length; i += 4) {
-                        data[i] += brightness;
-                        data[i+1] += brightness;
-                        data[i+2] += brightness;
-                    }
-                    break;
-                    
-                case 'contrast':
-                    const contrast = value / 100;
-                    const intercept = 128 * (1 - contrast);
-                    for (let i = 0; i < data.length; i += 4) {
-                        data[i] = data[i] * contrast + intercept;
-                        data[i+1] = data[i+1] * contrast + intercept;
-                        data[i+2] = data[i+2] * contrast + intercept;
-                    }
-                    break;
-                    
-                case 'saturation':
-                    for (let i = 0; i < data.length; i += 4) {
-                        const r = data[i], g = data[i+1], b = data[i+2];
-                        const gray = 0.2989 * r + 0.5870 * g + 0.1140 * b;
-                        data[i] = gray + (r - gray) * (value / 100);
-                        data[i+1] = gray + (g - gray) * (value / 100);
-                        data[i+2] = gray + (b - gray) * (value / 100);
-                    }
-                    break;
-                    
-                case 'hue':
-                    const hue = value * Math.PI / 180;
-                    const cos = Math.cos(hue);
-                    const sin = Math.sin(hue);
-                    for (let i = 0; i < data.length; i += 4) {
-                        const r = data[i];
-                        const g = data[i+1];
-                        const b = data[i+2];
-                        
-                        data[i] = r * (cos + (1 - cos)/3) + g * ((1 - cos)/3 - Math.sqrt(1/3)*sin) + b * ((1 - cos)/3 + Math.sqrt(1/3)*sin);
-                        data[i+1] = r * ((1 - cos)/3 + Math.sqrt(1/3)*sin) + g * (cos + (1 - cos)/3) + b * ((1 - cos)/3 - Math.sqrt(1/3)*sin);
-                        data[i+2] = r * ((1 - cos)/3 - Math.sqrt(1/3)*sin) + g * ((1 - cos)/3 + Math.sqrt(1/3)*sin) + b * (cos + (1 - cos)/3);
-                    }
-                    break;
-                    
-                case 'exposure':
-                    const exposure = value / 100;
-                    for (let i = 0; i < data.length; i += 4) {
-                        data[i] *= exposure;
-                        data[i+1] *= exposure;
-                        data[i+2] *= exposure;
-                    }
-                    break;
-            }
-            clampColors(data);
+        function applyAdjustments(data) {
+            applyBasicAdjustments(data);
+            applyAdvancedAdjustments(data);
         }
 
-        function applyHighlightShadow(data, highlight, shadow) {
-            const highlightFactor = highlight / 100;
-            const shadowFactor = shadow / 100;
-            
+        function applyBasicAdjustments(data) {
+            // 亮度
+            const brightness = (controls.brightness.value - 100) * 2.55;
+            // 对比度
+            const contrast = controls.contrast.value / 100;
+            const contrastIntercept = 128 * (1 - contrast);
+            // 饱和度
+            const saturation = controls.saturation.value / 100;
+
             for (let i = 0; i < data.length; i += 4) {
-                const luminance = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
-                
-                if (luminance > 160) {
-                    data[i] *= highlightFactor;
-                    data[i+1] *= highlightFactor;
-                    data[i+2] *= highlightFactor;
-                } else if (luminance < 96) {
-                    data[i] *= shadowFactor;
-                    data[i+1] *= shadowFactor;
-                    data[i+2] *= shadowFactor;
-                }
+                // 亮度调整
+                data[i] += brightness;
+                data[i+1] += brightness;
+                data[i+2] += brightness;
+
+                // 对比度调整
+                data[i] = data[i] * contrast + contrastIntercept;
+                data[i+1] = data[i+1] * contrast + contrastIntercept;
+                data[i+2] = data[i+2] * contrast + contrastIntercept;
+
+                // 饱和度调整
+                const gray = 0.2989 * data[i] + 0.5870 * data[i+1] + 0.1140 * data[i+2];
+                data[i] = gray + (data[i] - gray) * saturation;
+                data[i+1] = gray + (data[i+1] - gray) * saturation;
+                data[i+2] = gray + (data[i+2] - gray) * saturation;
             }
-            clampColors(data);
         }
 
-        function applySharpen(data, width, height, intensity) {
-            if (intensity === 100) return;
+        function applyAdvancedAdjustments(data) {
+            // 色相调整
+            const hue = controls.hue.value * Math.PI / 180;
+            const cos = Math.cos(hue);
+            const sin = Math.sin(hue);
             
-            const tempData = new Uint8ClampedArray(data);
-            const factor = (intensity - 100) / 50;
+            // 高光/阴影
+            const highlight = controls.highlight.value / 100;
+            const shadow = controls.shadow.value / 100;
+
+            for (let i = 0; i < data.length; i += 4) {
+                // 色相调整
+                const r = data[i];
+                const g = data[i+1];
+                const b = data[i+2];
+
+                data[i] = r * (cos + (1 - cos)/3) + g * ((1 - cos)/3 - Math.sqrt(1/3)*sin) + b * ((1 - cos)/3 + Math.sqrt(1/3)*sin);
+                data[i+1] = r * ((1 - cos)/3 + Math.sqrt(1/3)*sin) + g * (cos + (1 - cos)/3) + b * ((1 - cos)/3 - Math.sqrt(1/3)*sin);
+                data[i+2] = r * ((1 - cos)/3 - Math.sqrt(1/3)*sin) + g * ((1 - cos)/3 + Math.sqrt(1/3)*sin) + b * (cos + (1 - cos)/3);
+
+                // 高光/阴影调整
+                const luminance = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
+                if (luminance > 160) {
+                    data[i] *= highlight;
+                    data[i+1] *= highlight;
+                    data[i+2] *= highlight;
+                } else if (luminance < 96) {
+                    data[i] *= shadow;
+                    data[i+1] *= shadow;
+                    data[i+2] *= shadow;
+                }
+
+                clampColors(data, i);
+            }
+        }
+
+        function applySharpen(data, width, height) {
+            const intensity = (controls.sharpen.value - 100) / 50;
+            if (intensity === 0) return;
+
             const kernel = [
-                0, -1 * factor, 0,
-                -1 * factor, 1 + 4 * factor, -1 * factor,
-                0, -1 * factor, 0
+                0, -intensity, 0,
+                -intensity, 1 + 4*intensity, -intensity,
+                0, -intensity, 0
             ];
 
+            const tempData = new Uint8ClampedArray(data);
             for (let y = 1; y < height - 1; y++) {
                 for (let x = 1; x < width - 1; x++) {
                     for (let c = 0; c < 3; c++) {
@@ -417,10 +388,97 @@
             }
         }
 
-        function clampColors(data) {
-            for (let i = 0; i < data.length; i++) {
-                data[i] = Math.min(255, Math.max(0, data[i]));
+        function handleFilterClick(btn) {
+            const filterName = btn.dataset.filter;
+            if (filterName === 'reset') {
+                resetControls();
+            } else {
+                applyPreset(filterName);
             }
+            applyFilters();
+            updateActiveFilter(btn);
+        }
+
+        function applyPreset(presetName) {
+            const preset = presets[presetName];
+            Object.entries(preset).forEach(([key, value]) => {
+                if (controls[key]) {
+                    controls[key].element.value = value;
+                    controls[key].value = value;
+                    updateDisplay(controls[key]);
+                }
+            });
+        }
+
+        // 辅助函数
+        function getControlConfig(id, defaultValue) {
+            return {
+                element: document.getElementById(id),
+                display: document.querySelector(`#${id} + .value-display`),
+                value: defaultValue
+            };
+        }
+
+        function updateControlValue(control) {
+            control.value = parseInt(control.element.value);
+            updateDisplay(control);
+        }
+
+        function updateDisplay(control) {
+            control.display.textContent = 
+                control.element.id === 'hue' ? `${control.value}°` : `${control.value}%`;
+        }
+
+        function resetControls() {
+            Object.values(controls).forEach(control => {
+                const defaultValue = control.element.id === 'hue' ? 0 : 100;
+                control.element.value = defaultValue;
+                control.value = defaultValue;
+                updateDisplay(control);
+            });
+        }
+
+        function updateActiveFilter(activeBtn) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn === activeBtn);
+            });
+        }
+
+        function clampColors(data, i) {
+            data[i] = Math.min(255, Math.max(0, data[i]));
+            data[i+1] = Math.min(255, Math.max(0, data[i+1]));
+            data[i+2] = Math.min(255, Math.max(0, data[i+2]));
+        }
+
+        function loadImage(file) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error('图片加载失败'));
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        function throttle(fn, delay) {
+            let lastCall = 0;
+            return (...args) => {
+                const now = Date.now();
+                if (now - lastCall >= delay) {
+                    lastCall = now;
+                    fn(...args);
+                }
+            };
+        }
+
+        function saveImage() {
+            if (!sourceImage) return;
+            
+            const link = document.createElement('a');
+            link.download = `processed_${Date.now()}.jpg`;
+            canvas.toBlob(blob => {
+                link.href = URL.createObjectURL(blob);
+                link.click();
+            }, 'image/jpeg', config.quality);
         }
     </script>
 </body>
