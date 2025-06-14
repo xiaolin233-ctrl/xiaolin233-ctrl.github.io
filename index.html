@@ -3,230 +3,773 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能配色推荐</title>
+    <title>DeepSeek AI 聊天助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #3498db;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --dark-bg: #0f172a;
+            --darker-bg: #0b1120;
+            --card-bg: #1e293b;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --border: #334155;
+            --user-msg-bg: #1e3a8a;
+            --ai-msg-bg: #1e293b;
         }
-
-        body {
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f6fa;
         }
-
-        .container {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        .color-picker-section {
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text);
+            height: 100vh;
             display: flex;
-            gap: 1rem;
+            flex-direction: column;
+        }
+        
+        /* 头部样式 */
+        header {
+            background-color: var(--darker-bg);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
-        #baseColor {
-            width: 60px;
-            height: 40px;
-            cursor: pointer;
-        }
-
-        .scheme-type {
-            padding: 8px 12px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-
-        .color-scheme {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .color-card {
-            height: 150px;
-            border-radius: 8px;
+        
+        .logo {
             display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            padding: 10px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            position: relative;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            color: var(--primary);
+            font-size: 24px;
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* 主容器 */
+        .container {
+            display: flex;
+            flex: 1;
             overflow: hidden;
         }
-
-        .color-card:hover {
-            transform: translateY(-5px);
+        
+        /* 侧边栏 */
+        .sidebar {
+            width: 260px;
+            background-color: var(--darker-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
-
-        .color-value {
-            background: rgba(0,0,0,0.7);
+        
+        .new-chat-btn {
+            background-color: var(--primary);
             color: white;
-            padding: 4px 8px;
+            border: none;
+            padding: 12px 16px;
+            margin: 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .new-chat-btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .history-title {
+            padding: 16px 16px 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .history-list {
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .history-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-radius: 6px;
+            margin: 0 8px 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.2s;
+        }
+        
+        .history-item:hover {
+            background-color: rgba(30, 41, 59, 0.5);
+        }
+        
+        .history-item.active {
+            background-color: var(--card-bg);
+        }
+        
+        /* 聊天区域 */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .message {
+            max-width: 85%;
+            padding: 16px 20px;
+            border-radius: 12px;
+            line-height: 1.6;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .user-message {
+            background-color: var(--user-msg-bg);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .ai-message {
+            background-color: var(--ai-msg-bg);
+            border: 1px solid var(--border);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .ai-icon {
+            color: var(--primary);
+        }
+        
+        .user-icon {
+            color: var(--success);
+        }
+        
+        .message-content {
+            white-space: pre-wrap;
+            line-height: 1.7;
+        }
+        
+        .message-content code {
+            background-color: rgba(30, 41, 59, 0.8);
+            padding: 2px 6px;
             border-radius: 4px;
-            font-size: 0.9em;
+            font-family: 'Courier New', monospace;
         }
-
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
+        
+        /* 输入区域 */
+        .input-container {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            background-color: var(--darker-bg);
+        }
+        
+        .input-area {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .message-input {
+            width: 100%;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 60px 16px 20px;
+            color: var(--text);
+            font-size: 1rem;
+            resize: none;
+            min-height: 60px;
+            max-height: 200px;
+            outline: none;
+        }
+        
+        .message-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+        }
+        
+        .send-btn {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            background-color: var(--primary);
             color: white;
-            padding: 12px 24px;
-            border-radius: 5px;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .send-btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .send-btn:disabled {
+            background-color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+        
+        /* API密钥设置 */
+        .api-key-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .api-key-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .api-key-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .api-key-header {
+            margin-bottom: 20px;
+        }
+        
+        .api-key-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .api-key-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .api-key-form {
+            margin-top: 20px;
+        }
+        
+        .api-key-input {
+            width: 100%;
+            background-color: var(--darker-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            color: var(--text);
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        
+        .api-key-input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .api-key-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .api-key-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .api-key-save {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+        }
+        
+        .api-key-save:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .api-key-cancel {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        
+        .api-key-cancel:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        /* 设置按钮 */
+        .settings-btn {
+            background-color: var(--card-bg);
+            border: none;
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .settings-btn:hover {
+            background-color: rgba(30, 41, 59, 0.8);
+        }
+        
+        /* 加载指示器 */
+        .typing-indicator {
             display: none;
+            background-color: var(--ai-msg-bg);
+            border: 1px solid var(--border);
+            padding: 16px 20px;
+            border-radius: 12px;
+            align-self: flex-start;
+            margin-bottom: 24px;
+            width: 120px;
+        }
+        
+        .typing-indicator.show {
+            display: block;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--text-secondary);
+            border-radius: 50%;
+            animation: bounce 1.5s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        /* 动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                left: -260px;
+                height: 100%;
+                z-index: 100;
+                transition: transform 0.3s;
+            }
+            
+            .sidebar.show {
+                transform: translateX(260px);
+            }
+            
+            .message {
+                max-width: 90%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>智能配色推荐工具</h1>
-        <div class="color-picker-section">
-            <input type="color" id="baseColor" value="#3498db">
-            <select id="schemeType" class="scheme-type">
-                <option value="monochromatic">单色方案</option>
-                <option value="analogous">类似色方案</option>
-                <option value="complementary">互补色方案</option>
-                <option value="triadic">三元色方案</option>
-                <option value="tetradic">四元色方案</option>
-            </select>
+    <!-- 头部 -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-robot logo-icon"></i>
+            <div class="logo-text">DeepSeek AI</div>
         </div>
-        <div class="color-scheme" id="colorScheme"></div>
-    </div>
-    <div class="toast" id="toast">已复制到剪贴板</div>
-
-    <script>
-        function hexToHSL(hex) {
-            let r = parseInt(hex.slice(1, 3), 16) / 255;
-            let g = parseInt(hex.slice(3, 5), 16) / 255;
-            let b = parseInt(hex.slice(5, 7), 16) / 255;
-
-            let max = Math.max(r, g, b), min = Math.min(r, g, b);
-            let h, s, l = (max + min) / 2;
-
-            if (max === min) {
-                h = s = 0;
-            } else {
-                let d = max - min;
-                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-                switch (max) {
-                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                    case g: h = (b - r) / d + 2; break;
-                    case b: h = (r - g) / d + 4; break;
-                }
-                h /= 6;
-            }
-            return [h * 360, s * 100, l * 100];
-        }
-
-        function HSLToHex(h, s, l) {
-            h /= 360;
-            s /= 100;
-            l /= 100;
-            
-            let r, g, b;
-            if (s === 0) {
-                r = g = b = l;
-            } else {
-                const hue2rgb = (p, q, t) => {
-                    if (t < 0) t += 1;
-                    if (t > 1) t -= 1;
-                    if (t < 1/6) return p + (q - p) * 6 * t;
-                    if (t < 1/2) return q;
-                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-                    return p;
-                };
-                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-                const p = 2 * l - q;
-                r = hue2rgb(p, q, h + 1/3);
-                g = hue2rgb(p, q, h);
-                b = hue2rgb(p, q, h - 1/3);
-            }
-            const toHex = x => {
-                const hex = Math.round(x * 255).toString(16);
-                return hex.length === 1 ? '0' + hex : hex;
-            };
-            return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-        }
-
-        function generateColorScheme(baseColor, schemeType) {
-            const [h, s, l] = hexToHSL(baseColor);
-            let colors = [];
-
-            switch (schemeType) {
-                case 'monochromatic':
-                    colors = [
-                        HSLToHex(h, s, Math.min(l + 20, 100)),
-                        HSLToHex(h, s, l),
-                        HSLToHex(h, s, Math.max(l - 20, 0))
-                    ];
-                    break;
-                case 'analogous':
-                    colors = [
-                        HSLToHex((h + 30) % 360, s, l),
-                        HSLToHex(h, s, l),
-                        HSLToHex((h - 30 + 360) % 360, s, l)
-                    ];
-                    break;
-                case 'complementary':
-                    colors = [
-                        HSLToHex(h, s, l),
-                        HSLToHex((h + 180) % 360, s, l)
-                    ];
-                    break;
-                case 'triadic':
-                    colors = [
-                        HSLToHex(h, s, l),
-                        HSLToHex((h + 120) % 360, s, l),
-                        HSLToHex((h + 240) % 360, s, l)
-                    ];
-                    break;
-                case 'tetradic':
-                    colors = [
-                        HSLToHex(h, s, l),
-                        HSLToHex((h + 60) % 360, s, l),
-                        HSLToHex((h + 180) % 360, s, l),
-                        HSLToHex((h + 240) % 360, s, l)
-                    ];
-                    break;
-            }
-            return colors;
-        }
-
-        function updateColorScheme() {
-            const baseColor = document.getElementById('baseColor').value;
-            const schemeType = document.getElementById('schemeType').value;
-            const colors = generateColorScheme(baseColor, schemeType);
-            
-            const colorScheme = document.getElementById('colorScheme');
-            colorScheme.innerHTML = colors.map(color => `
-                <div class="color-card" style="background: ${color}" onclick="copyToClipboard('${color}')">
-                    <span class="color-value">${color}</span>
+        <button class="settings-btn" id="settingsBtn">
+            <i class="fas fa-key"></i>
+            <span>API 密钥</span>
+        </button>
+    </header>
+    
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 侧边栏 -->
+        <div class="sidebar" id="sidebar">
+            <button class="new-chat-btn" id="newChatBtn">
+                <i class="fas fa-plus"></i>
+                新对话
+            </button>
+            <div class="history-title">历史记录</div>
+            <div class="history-list" id="historyList">
+                <div class="history-item active">
+                    <i class="fas fa-comment"></i>
+                    <span>欢迎使用DeepSeek</span>
                 </div>
-            `).join('');
-        }
+                <div class="history-item">
+                    <i class="fas fa-comment"></i>
+                    <span>Python学习建议</span>
+                </div>
+                <div class="history-item">
+                    <i class="fas fa-comment"></i>
+                    <span>AI发展前景分析</span>
+                </div>
+                <div class="history-item">
+                    <i class="fas fa-comment"></i>
+                    <span>JavaScript编程技巧</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 聊天区域 -->
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <!-- AI欢迎消息 -->
+                <div class="message ai-message">
+                    <div class="message-header">
+                        <i class="fas fa-robot ai-icon"></i>
+                        <span>DeepSeek AI</span>
+                    </div>
+                    <div class="message-content">
+                        你好！我是DeepSeek AI助手，很高兴为你服务。你可以向我提问任何问题，我会尽力提供准确、有用的回答。
+                        
+                        例如：
+                        - 解释技术概念
+                        - 帮助解决编程问题
+                        - 提供学习建议
+                        - 分析当前趋势
+                        
+                        请确保你已经设置了正确的API密钥以便使用完整功能。
+                    </div>
+                </div>
+                
+                <!-- 用户消息示例 -->
+                <div class="message user-message">
+                    <div class="message-header">
+                        <i class="fas fa-user user-icon"></i>
+                        <span>用户</span>
+                    </div>
+                    <div class="message-content">
+                        请帮我解释一下什么是机器学习？
+                    </div>
+                </div>
+                
+                <!-- AI回复示例 -->
+                <div class="message ai-message">
+                    <div class="message-header">
+                        <i class="fas fa-robot ai-icon"></i>
+                        <span>DeepSeek AI</span>
+                    </div>
+                    <div class="message-content">
+                        机器学习是人工智能的一个子领域，它使计算机系统能够从数据中学习和改进经验，而无需显式编程。核心思想是开发能够接收输入数据并利用统计分析的算法，以输出预测结果。
 
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text);
-            const toast = document.getElementById('toast');
-            toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 2000);
-        }
+                        主要类型包括：
+                        1. 监督学习：使用标记数据训练模型（如分类、回归）
+                        2. 无监督学习：从无标签数据中发现模式（如聚类）
+                        3. 强化学习：通过奖励机制学习最优策略
 
+                        实际应用包括：
+                        - 推荐系统（如Netflix、Amazon）
+                        - 图像识别（如人脸识别）
+                        - 自然语言处理（如ChatGPT）
+                        - 欺诈检测
+                        - 自动驾驶
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 正在输入指示器 -->
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+            
+            <!-- 输入区域 -->
+            <div class="input-container">
+                <div class="input-area">
+                    <textarea 
+                        class="message-input" 
+                        id="messageInput" 
+                        placeholder="输入消息..." 
+                        rows="1"
+                    ></textarea>
+                    <button class="send-btn" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- API密钥设置模态框 -->
+    <div class="api-key-modal" id="apiKeyModal">
+        <div class="api-key-container">
+            <div class="api-key-header">
+                <h2 class="api-key-title">设置API密钥</h2>
+                <p class="api-key-description">
+                    要使用DeepSeek AI的全部功能，您需要提供有效的API密钥。
+                    请从DeepSeek官网获取您的API密钥并在此处输入。
+                </p>
+            </div>
+            <div class="api-key-form">
+                <input 
+                    type="password" 
+                    class="api-key-input" 
+                    id="apiKeyInput" 
+                    placeholder="输入您的API密钥"
+                >
+                <div class="api-key-buttons">
+                    <button class="api-key-btn api-key-cancel" id="apiKeyCancel">取消</button>
+                    <button class="api-key-btn api-key-save" id="apiKeySave">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // DOM元素
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const chatMessages = document.getElementById('chatMessages');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const apiKeyModal = document.getElementById('apiKeyModal');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const apiKeySave = document.getElementById('apiKeySave');
+        const apiKeyCancel = document.getElementById('apiKeyCancel');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const newChatBtn = document.getElementById('newChatBtn');
+        
+        // 调整文本区域高度
+        function adjustTextareaHeight() {
+            messageInput.style.height = 'auto';
+            messageInput.style.height = Math.min(messageInput.scrollHeight, 200) + 'px';
+        }
+        
+        // 添加消息到聊天
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            
+            const iconClass = isUser ? 'fas fa-user user-icon' : 'fas fa-robot ai-icon';
+            const sender = isUser ? '用户' : 'DeepSeek AI';
+            
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <i class="${iconClass}"></i>
+                    <span>${sender}</span>
+                </div>
+                <div class="message-content">${content}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // 模拟AI响应
+        function simulateAIResponse(userMessage) {
+            // 显示正在输入指示器
+            typingIndicator.classList.add('show');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // 模拟网络延迟
+            setTimeout(() => {
+                typingIndicator.classList.remove('show');
+                
+                // 根据用户消息生成响应
+                let aiResponse = '';
+                
+                if (userMessage.toLowerCase().includes('你好') || userMessage.toLowerCase().includes('hello')) {
+                    aiResponse = `你好！我是DeepSeek AI助手。有什么我可以帮助你的吗？`;
+                } else if (userMessage.toLowerCase().includes('机器学习')) {
+                    aiResponse = `机器学习是人工智能的核心领域，它使计算机能够从数据中学习并做出决策。主要类型包括监督学习、无监督学习和强化学习。应用包括推荐系统、图像识别、自然语言处理等。`;
+                } else if (userMessage.toLowerCase().includes('api')) {
+                    aiResponse = `要使用DeepSeek API，您需要：
+1. 在DeepSeek官网注册账户
+2. 创建API密钥
+3. 在设置中保存密钥
+4. 使用API端点发送请求
+
+示例代码：
+\`\`\`python
+import requests
+
+url = "https://api.deepseek.com/chat"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+data = {
+    "model": "deepseek-chat",
+    "messages": [{"role": "user", "content": "你的问题"}]
+}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+\`\`\``;
+                } else if (userMessage.toLowerCase().includes('谢谢')) {
+                    aiResponse = `不用客气！如果还有其他问题，随时可以问我。`;
+                } else {
+                    aiResponse = `感谢你的消息："${userMessage}"。这是一个模拟响应，实际应用中会连接到DeepSeek API生成真实回答。请确保设置了正确的API密钥以使用完整功能。`;
+                }
+                
+                addMessage(aiResponse, false);
+            }, 1500);
+        }
+        
+        // 处理发送消息
+        function handleSendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            // 添加用户消息
+            addMessage(message, true);
+            messageInput.value = '';
+            adjustTextareaHeight();
+            
+            // 模拟AI响应
+            simulateAIResponse(message);
+        }
+        
+        // 事件监听器
+        messageInput.addEventListener('input', adjustTextareaHeight);
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+            }
+        });
+        
+        sendBtn.addEventListener('click', handleSendMessage);
+        
+        // API密钥设置
+        settingsBtn.addEventListener('click', () => {
+            apiKeyModal.classList.add('show');
+        });
+        
+        apiKeySave.addEventListener('click', () => {
+            const apiKey = apiKeyInput.value.trim();
+            if (apiKey) {
+                localStorage.setItem('deepseek-api-key', apiKey);
+                alert('API密钥已保存！');
+                apiKeyModal.classList.remove('show');
+            } else {
+                alert('请输入有效的API密钥');
+            }
+        });
+        
+        apiKeyCancel.addEventListener('click', () => {
+            apiKeyModal.classList.remove('show');
+        });
+        
+        // 点击模态框外部关闭
+        apiKeyModal.addEventListener('click', (e) => {
+            if (e.target === apiKeyModal) {
+                apiKeyModal.classList.remove('show');
+            }
+        });
+        
+        // 新对话按钮
+        newChatBtn.addEventListener('click', () => {
+            // 清空聊天区域，只保留第一条欢迎消息
+            while (chatMessages.children.length > 1) {
+                chatMessages.removeChild(chatMessages.lastChild);
+            }
+        });
+        
         // 初始化
-        document.getElementById('baseColor').addEventListener('input', updateColorScheme);
-        document.getElementById('schemeType').addEventListener('change', updateColorScheme);
-        updateColorScheme();
+        window.addEventListener('DOMContentLoaded', () => {
+            // 从本地存储加载API密钥
+            const savedApiKey = localStorage.getItem('deepseek-api-key');
+            if (savedApiKey) {
+                apiKeyInput.value = savedApiKey;
+            }
+            
+            // 初始化文本区域高度
+            adjustTextareaHeight();
+        });
     </script>
 </body>
 </html>
