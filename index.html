@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeepSeek AI 聊天助手</title>
+    <title>DeepSeek AI聊天助手</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -111,11 +111,32 @@
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-title span {
+            flex: 1;
+        }
+        
+        .clear-history-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            padding: 4px;
+        }
+        
+        .clear-history-btn:hover {
+            color: var(--error);
         }
         
         .history-list {
             overflow-y: auto;
             flex: 1;
+            padding-bottom: 10px;
         }
         
         .history-item {
@@ -127,6 +148,7 @@
             align-items: center;
             gap: 10px;
             transition: background-color 0.2s;
+            position: relative;
         }
         
         .history-item:hover {
@@ -137,6 +159,40 @@
             background-color: var(--card-bg);
         }
         
+        .history-item-title {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.95rem;
+        }
+        
+        .history-item-time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        .history-item-delete {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.2s;
+            cursor: pointer;
+        }
+        
+        .history-item:hover .history-item-delete {
+            opacity: 1;
+        }
+        
+        .history-item-delete:hover {
+            color: var(--error);
+        }
+        
         /* 聊天区域 */
         .chat-container {
             flex: 1;
@@ -144,6 +200,42 @@
             flex-direction: column;
             overflow: hidden;
             position: relative;
+        }
+        
+        .chat-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .chat-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .chat-action-btn {
+            background-color: var(--card-bg);
+            border: none;
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+        }
+        
+        .chat-action-btn:hover {
+            background-color: rgba(30, 41, 59, 0.8);
         }
         
         .chat-messages {
@@ -418,6 +510,34 @@
             animation-delay: 0.4s;
         }
         
+        /* 空状态 */
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .empty-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .empty-description {
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+        
         /* 动画 */
         @keyframes fadeIn {
             from {
@@ -456,6 +576,18 @@
             .message {
                 max-width: 90%;
             }
+            
+            .chat-header {
+                padding: 12px;
+            }
+            
+            .chat-title {
+                font-size: 1rem;
+            }
+            
+            .chat-action-btn span {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -480,80 +612,47 @@
                 <i class="fas fa-plus"></i>
                 新对话
             </button>
-            <div class="history-title">历史记录</div>
+            <div class="history-title">
+                <span>历史记录</span>
+                <button class="clear-history-btn" id="clearHistoryBtn" title="清除所有历史记录">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
             <div class="history-list" id="historyList">
-                <div class="history-item active">
-                    <i class="fas fa-comment"></i>
-                    <span>欢迎使用DeepSeek</span>
-                </div>
-                <div class="history-item">
-                    <i class="fas fa-comment"></i>
-                    <span>Python学习建议</span>
-                </div>
-                <div class="history-item">
-                    <i class="fas fa-comment"></i>
-                    <span>AI发展前景分析</span>
-                </div>
-                <div class="history-item">
-                    <i class="fas fa-comment"></i>
-                    <span>JavaScript编程技巧</span>
-                </div>
+                <!-- 历史对话将通过JS动态生成 -->
             </div>
         </div>
         
         <!-- 聊天区域 -->
         <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title" id="currentChatTitle">新对话</div>
+                <div class="chat-actions">
+                    <button class="chat-action-btn" id="renameChatBtn">
+                        <i class="fas fa-edit"></i>
+                        <span>重命名</span>
+                    </button>
+                    <button class="chat-action-btn" id="deleteChatBtn">
+                        <i class="fas fa-trash-alt"></i>
+                        <span>删除</span>
+                    </button>
+                </div>
+            </div>
+            
             <div class="chat-messages" id="chatMessages">
-                <!-- AI欢迎消息 -->
-                <div class="message ai-message">
-                    <div class="message-header">
-                        <i class="fas fa-robot ai-icon"></i>
-                        <span>DeepSeek AI</span>
-                    </div>
-                    <div class="message-content">
-                        你好！我是DeepSeek AI助手，很高兴为你服务。你可以向我提问任何问题，我会尽力提供准确、有用的回答。
-                        
-                        例如：
-                        - 解释技术概念
-                        - 帮助解决编程问题
-                        - 提供学习建议
-                        - 分析当前趋势
-                        
-                        请确保你已经设置了正确的API密钥以便使用完整功能。
-                    </div>
-                </div>
-                
-                <!-- 用户消息示例 -->
-                <div class="message user-message">
-                    <div class="message-header">
-                        <i class="fas fa-user user-icon"></i>
-                        <span>用户</span>
-                    </div>
-                    <div class="message-content">
-                        请帮我解释一下什么是机器学习？
-                    </div>
-                </div>
-                
-                <!-- AI回复示例 -->
-                <div class="message ai-message">
-                    <div class="message-header">
-                        <i class="fas fa-robot ai-icon"></i>
-                        <span>DeepSeek AI</span>
-                    </div>
-                    <div class="message-content">
-                        机器学习是人工智能的一个子领域，它使计算机系统能够从数据中学习和改进经验，而无需显式编程。核心思想是开发能够接收输入数据并利用统计分析的算法，以输出预测结果。
-
-                        主要类型包括：
-                        1. 监督学习：使用标记数据训练模型（如分类、回归）
-                        2. 无监督学习：从无标签数据中发现模式（如聚类）
-                        3. 强化学习：通过奖励机制学习最优策略
-
-                        实际应用包括：
-                        - 推荐系统（如Netflix、Amazon）
-                        - 图像识别（如人脸识别）
-                        - 自然语言处理（如ChatGPT）
-                        - 欺诈检测
-                        - 自动驾驶
+                <div class="empty-state" id="emptyChatState">
+                    <i class="fas fa-comments empty-icon"></i>
+                    <h2 class="empty-title">开始新对话</h2>
+                    <p class="empty-description">
+                        输入消息开始与DeepSeek AI聊天。您可以询问任何问题，获取帮助或进行创意写作。
+                    </p>
+                    <div class="suggestions">
+                        <p>尝试询问：</p>
+                        <ul style="text-align: left; margin-top: 10px;">
+                            <li>解释量子计算的基本概念</li>
+                            <li>用Python写一个快速排序算法</li>
+                            <li>如何学习人工智能？</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -609,7 +708,35 @@
         </div>
     </div>
     
+    <!-- 重命名模态框 -->
+    <div class="api-key-modal" id="renameModal">
+        <div class="api-key-container">
+            <div class="api-key-header">
+                <h2 class="api-key-title">重命名对话</h2>
+                <p class="api-key-description">
+                    为当前对话设置一个新名称
+                </p>
+            </div>
+            <div class="api-key-form">
+                <input 
+                    type="text" 
+                    class="api-key-input" 
+                    id="renameInput" 
+                    placeholder="输入新对话名称"
+                >
+                <div class="api-key-buttons">
+                    <button class="api-key-btn api-key-cancel" id="renameCancel">取消</button>
+                    <button class="api-key-btn api-key-save" id="renameSave">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script>
+        // 聊天数据结构
+        let chatHistory = [];
+        let currentChatId = null;
+        
         // DOM元素
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
@@ -621,6 +748,16 @@
         const apiKeyCancel = document.getElementById('apiKeyCancel');
         const settingsBtn = document.getElementById('settingsBtn');
         const newChatBtn = document.getElementById('newChatBtn');
+        const historyList = document.getElementById('historyList');
+        const currentChatTitle = document.getElementById('currentChatTitle');
+        const emptyChatState = document.getElementById('emptyChatState');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        const renameChatBtn = document.getElementById('renameChatBtn');
+        const deleteChatBtn = document.getElementById('deleteChatBtn');
+        const renameModal = document.getElementById('renameModal');
+        const renameInput = document.getElementById('renameInput');
+        const renameSave = document.getElementById('renameSave');
+        const renameCancel = document.getElementById('renameCancel');
         
         // 调整文本区域高度
         function adjustTextareaHeight() {
@@ -628,8 +765,26 @@
             messageInput.style.height = Math.min(messageInput.scrollHeight, 200) + 'px';
         }
         
+        // 生成唯一ID
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substring(2);
+        }
+        
+        // 格式化日期
+        function formatDate(date) {
+            return new Date(date).toLocaleString('zh-CN', {
+                month: 'numeric',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
         // 添加消息到聊天
         function addMessage(content, isUser = false) {
+            // 隐藏空状态
+            emptyChatState.style.display = 'none';
+            
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
             
@@ -648,11 +803,151 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
         
+        // 创建新对话
+        function createNewChat() {
+            const newChatId = generateId();
+            const newChat = {
+                id: newChatId,
+                title: "新对话",
+                messages: [],
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            currentChatId = newChatId;
+            chatHistory.unshift(newChat);
+            saveChatHistory();
+            renderChatHistory();
+            loadChat(currentChatId);
+        }
+        
+        // 加载对话
+        function loadChat(chatId) {
+            const chat = chatHistory.find(c => c.id === chatId);
+            if (!chat) return;
+            
+            currentChatId = chatId;
+            chatMessages.innerHTML = '';
+            
+            if (chat.messages.length === 0) {
+                emptyChatState.style.display = 'flex';
+            } else {
+                chat.messages.forEach(msg => {
+                    addMessage(msg.content, msg.role === 'user');
+                });
+            }
+            
+            currentChatTitle.textContent = chat.title;
+            
+            // 更新侧边栏活动项
+            document.querySelectorAll('.history-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.id === chatId);
+            });
+        }
+        
+        // 保存聊天记录
+        function saveChatHistory() {
+            localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+        }
+        
+        // 渲染聊天历史
+        function renderChatHistory() {
+            historyList.innerHTML = '';
+            
+            chatHistory.forEach(chat => {
+                const historyItem = document.createElement('div');
+                historyItem.className = `history-item ${chat.id === currentChatId ? 'active' : ''}`;
+                historyItem.dataset.id = chat.id;
+                
+                historyItem.innerHTML = `
+                    <i class="fas fa-comment"></i>
+                    <div class="history-item-content">
+                        <div class="history-item-title">${chat.title}</div>
+                        <div class="history-item-time">${formatDate(chat.updatedAt)}</div>
+                    </div>
+                    <button class="history-item-delete" data-id="${chat.id}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                historyItem.addEventListener('click', () => {
+                    loadChat(chat.id);
+                });
+                
+                historyList.appendChild(historyItem);
+            });
+            
+            // 添加删除按钮事件
+            document.querySelectorAll('.history-item-delete').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteChat(btn.dataset.id);
+                });
+            });
+        }
+        
+        // 删除对话
+        function deleteChat(chatId) {
+            if (confirm('确定要删除这个对话吗？此操作无法撤销。')) {
+                chatHistory = chatHistory.filter(chat => chat.id !== chatId);
+                
+                if (currentChatId === chatId) {
+                    if (chatHistory.length > 0) {
+                        currentChatId = chatHistory[0].id;
+                        loadChat(currentChatId);
+                    } else {
+                        createNewChat();
+                    }
+                }
+                
+                saveChatHistory();
+                renderChatHistory();
+            }
+        }
+        
+        // 清除所有历史
+        function clearAllHistory() {
+            if (confirm('确定要清除所有历史记录吗？此操作无法撤销。')) {
+                chatHistory = [];
+                createNewChat();
+                saveChatHistory();
+                renderChatHistory();
+            }
+        }
+        
+        // 重命名对话
+        function renameCurrentChat(newTitle) {
+            if (!newTitle.trim()) return;
+            
+            const chat = chatHistory.find(c => c.id === currentChatId);
+            if (chat) {
+                chat.title = newTitle;
+                currentChatTitle.textContent = newTitle;
+                saveChatHistory();
+                renderChatHistory();
+            }
+        }
+        
         // 模拟AI响应
         function simulateAIResponse(userMessage) {
             // 显示正在输入指示器
             typingIndicator.classList.add('show');
             chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // 找到当前聊天
+            const chat = chatHistory.find(c => c.id === currentChatId);
+            if (!chat) return;
+            
+            // 保存用户消息
+            chat.messages.push({
+                role: 'user',
+                content: userMessage
+            });
+            
+            // 更新聊天时间
+            chat.updatedAt = new Date().toISOString();
+            saveChatHistory();
+            renderChatHistory();
             
             // 模拟网络延迟
             setTimeout(() => {
@@ -695,7 +990,19 @@ print(response.json())
                     aiResponse = `感谢你的消息："${userMessage}"。这是一个模拟响应，实际应用中会连接到DeepSeek API生成真实回答。请确保设置了正确的API密钥以使用完整功能。`;
                 }
                 
+                // 添加AI响应
                 addMessage(aiResponse, false);
+                
+                // 保存AI消息
+                chat.messages.push({
+                    role: 'assistant',
+                    content: aiResponse
+                });
+                
+                // 更新聊天时间
+                chat.updatedAt = new Date().toISOString();
+                saveChatHistory();
+                renderChatHistory();
             }, 1500);
         }
         
@@ -709,8 +1016,43 @@ print(response.json())
             messageInput.value = '';
             adjustTextareaHeight();
             
+            // 如果是新对话且没有消息，设置标题
+            const chat = chatHistory.find(c => c.id === currentChatId);
+            if (chat && chat.messages.length === 0 && chat.title === "新对话") {
+                const newTitle = message.length > 20 ? message.substring(0, 20) + '...' : message;
+                renameCurrentChat(newTitle);
+            }
+            
             // 模拟AI响应
             simulateAIResponse(message);
+        }
+        
+        // 初始化
+        function init() {
+            // 从本地存储加载聊天历史
+            const savedChatHistory = localStorage.getItem('chatHistory');
+            if (savedChatHistory) {
+                chatHistory = JSON.parse(savedChatHistory);
+            }
+            
+            // 加载API密钥
+            const savedApiKey = localStorage.getItem('deepseek-api-key');
+            if (savedApiKey) {
+                apiKeyInput.value = savedApiKey;
+            }
+            
+            // 初始化文本区域高度
+            adjustTextareaHeight();
+            
+            // 如果没有历史对话，创建新对话
+            if (chatHistory.length === 0) {
+                createNewChat();
+            } else {
+                // 加载最近的对话
+                currentChatId = chatHistory[0].id;
+                loadChat(currentChatId);
+                renderChatHistory();
+            }
         }
         
         // 事件监听器
@@ -752,24 +1094,36 @@ print(response.json())
         });
         
         // 新对话按钮
-        newChatBtn.addEventListener('click', () => {
-            // 清空聊天区域，只保留第一条欢迎消息
-            while (chatMessages.children.length > 1) {
-                chatMessages.removeChild(chatMessages.lastChild);
+        newChatBtn.addEventListener('click', createNewChat);
+        
+        // 清除历史按钮
+        clearHistoryBtn.addEventListener('click', clearAllHistory);
+        
+        // 重命名按钮
+        renameChatBtn.addEventListener('click', () => {
+            const chat = chatHistory.find(c => c.id === currentChatId);
+            if (chat) {
+                renameInput.value = chat.title;
+                renameModal.classList.add('show');
             }
         });
         
-        // 初始化
-        window.addEventListener('DOMContentLoaded', () => {
-            // 从本地存储加载API密钥
-            const savedApiKey = localStorage.getItem('deepseek-api-key');
-            if (savedApiKey) {
-                apiKeyInput.value = savedApiKey;
-            }
-            
-            // 初始化文本区域高度
-            adjustTextareaHeight();
+        renameSave.addEventListener('click', () => {
+            renameCurrentChat(renameInput.value.trim());
+            renameModal.classList.remove('show');
         });
+        
+        renameCancel.addEventListener('click', () => {
+            renameModal.classList.remove('show');
+        });
+        
+        // 删除对话按钮
+        deleteChatBtn.addEventListener('click', () => {
+            deleteChat(currentChatId);
+        });
+        
+        // 初始化应用
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
