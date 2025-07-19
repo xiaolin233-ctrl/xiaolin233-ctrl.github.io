@@ -5,6 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>电子木鱼 - 在线修行</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<body>
+    <h1>游戏存档管理器</h1>
+    <p>创建、加载和管理您的游戏存档文件</p>
+    
+    <h2>存档编辑器</h2>
+    
+    <div>
+        <label>存档名称:</label>
+        <input type="text" id="saveName" placeholder="输入存档名称">
+    </div>
+    
+    <div>
+        <label>存档数据 (JSON格式):</label>
+        <textarea id="saveData" rows="10" cols="50">{
+  "player": {
+    "name": "冒险者",
+    "level": 12,
+    "health": 85,
+    "mana": 120
+  },
+  "progress": {
+    "currentLevel": "黑暗城堡",
+    "checkpoint": "城堡大门",
+    "completedLevels": 8
+  },
+  "inventory": {
+    "weapons": ["火焰剑", "冰霜弓"],
+    "armor": ["龙鳞甲"],
+    "items": ["治疗药水 x5", "魔法卷轴 x3"]
+  },
+  "stats": {
+    "enemiesDefeated": 142,
+    "playTime": "15:42:36",
+    "achievements": ["新手冒险家", "屠龙者"]
+  }
+}</textarea>
+    </div>
+    
+    <div>
+        <button onclick="saveGame()">保存存档</button>
+        <button onclick="clearEditor()">清空数据</button>
+    </div>
+    
+    <h2>存档列表</h2>
+    <div id="saveList">
+        <p>暂无存档 - 创建新存档后将显示在这里</p>
+    </div>
+    
+    <p>游戏存档管理器 | 存档数据将保存为TXT文件</p>
+    
+    <script>
+        // 当前存档列表
+        let saves = JSON.parse(localStorage.getItem('gameSaves')) || [];
+        
+        // DOM元素
+        const saveNameInput = document.getElementById('saveName');
+        const saveDataTextarea = document.getElementById('saveData');
+        const saveList = document.getElementById('saveList');
+        
+        // 初始化存档列表
+        function initSaveList() {
+            if (saves.length === 0) {
+                saveList.innerHTML = '<p>暂无存档 - 创建新存档后将显示在这里</p>';
+                return;
+            }
+            
+            let saveListHTML = '';
+            saves.forEach(save => {
+                saveListHTML += `
+                    <div>
+                        <h3>${save.name} <small>(${save.date})</small></h3>
+                        <p>${JSON.stringify(save.data)}</p>
+                        <button onclick="loadSave(${save.id})">加载</button>
+                        <button onclick="deleteSave(${save.id})">删除</button>
+                        <button onclick="exportSave(${save.id})">导出TXT</button>
+                    </div>
+                    <hr>
+                `;
+            });
+            saveList.innerHTML = saveListHTML;
+        }
+        
+        // 保存存档
+        function saveGame() {
+            const name = saveNameInput.value.trim();
+            const dataStr = saveDataTextarea.value.trim();
+            
+            if (!name) {
+                alert('请输入存档名称');
+                return;
+            }
+            
+            if (!dataStr) {
+                alert('请输入存档数据');
+                return;
+            }
+            
+            try {
+                const data = JSON.parse(dataStr);
+                
+                const newSave = {
+                    id: Date.now(),
+                    name: name,
+                    date: new Date().toLocaleString(),
+                    data: data
+                };
+                
+                saves.unshift(newSave);
+                localStorage.setItem('gameSaves', JSON.stringify(saves));
+                initSaveList();
+                
+                saveNameInput.value = '';
+                saveDataTextarea.value = '';
+                
+                alert('存档创建成功！');
+            } catch (e) {
+                alert('存档数据格式错误，请输入有效的JSON格式');
+                console.error(e);
+            }
+        }
+        
+        // 清空编辑器
+        function clearEditor() {
+            if (confirm('确定要清空当前编辑的内容吗？')) {
+                saveNameInput.value = '';
+                saveDataTextarea.value = '';
+            }
+        }
+        
+        // 加载存档
+        function loadSave(id) {
+            const save = saves.find(s => s.id === id);
+            if (save) {
+                saveNameInput.value = save.name;
+                saveDataTextarea.value = JSON.stringify(save.data, null, 2);
+                alert(`已加载存档: ${save.name}`);
+            }
+        }
+        
+        // 删除存档
+        function deleteSave(id) {
+            if (confirm('确定要删除这个存档吗？此操作不可恢复。')) {
+                saves = saves.filter(s => s.id !== id);
+                localStorage.setItem('gameSaves', JSON.stringify(saves));
+                initSaveList();
+            }
+        }
+        
+        // 导出存档为TXT文件
+        function exportSave(id) {
+            const save = saves.find(s => s.id === id);
+            if (save) {
+                const dataStr = JSON.stringify(save.data, null, 2);
+                const blob = new Blob([dataStr], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${save.name.replace(/\s+/g, '_')}_${save.date.replace(/[:\s]/g, '-')}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            }
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', initSaveList);
+    </script>
+</body>
+
     <style>
         * {
             margin: 0;
@@ -539,288 +713,6 @@
                 setTimeout(createFloatingText, i * 300);
             }
         });
-    <style>
-        /* 核心样式 */
-        .save-manager {
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            padding: 20px;
-            width: 600px;
-            margin: 20px auto;
-            color: white;
-            font-family: Arial, sans-serif;
-        }
-        
-        .editor-section, .saves-section {
-            margin-bottom: 20px;
-        }
-        
-        .input-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #bbb;
-        }
-        
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #444;
-            background: rgba(30, 30, 40, 0.8);
-            color: white;
-        }
-        
-        textarea {
-            min-height: 150px;
-            font-family: monospace;
-        }
-        
-        .btn-group {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        .btn-primary {
-            background: #ff5722;
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: #4fc3f7;
-        }
-        
-        .save-item {
-            background: rgba(50, 50, 60, 0.6);
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border-left: 3px solid #4fc3f7;
-        }
-        
-        .save-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-        
-        .save-name {
-            font-weight: bold;
-            color: #ff9800;
-        }
-        
-        .save-actions {
-            display: flex;
-            gap: 5px;
-            margin-top: 10px;
-        }
-        
-        .action-btn {
-            padding: 5px 10px;
-            font-size: 0.85rem;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        
-        .load-btn { background: #8bc34a; }
-        .delete-btn { background: #f44336; color: white; }
-        .export-btn { background: #ff9800; }
-    </style>
-</head>
-<body>
-    <div class="save-manager">
-        <!-- 存档编辑器 -->
-        <div class="editor-section">
-            <h2>存档编辑器</h2>
-            <div class="input-group">
-                <label for="saveName">存档名称</label>
-                <input type="text" id="saveName" placeholder="输入存档名称">
-            </div>
-            <div class="input-group">
-                <label for="saveData">存档数据 (JSON格式)</label>
-                <textarea id="saveData">{
-  "level": 5,
-  "health": 85,
-  "inventory": ["sword", "shield", "potion"]
-}</textarea>
-            </div>
-            <div class="btn-group">
-                <button class="btn btn-primary" id="saveBtn">保存存档</button>
-                <button class="btn btn-secondary" id="clearBtn">清空数据</button>
-            </div>
-        </div>
-        
-        <!-- 存档列表 -->
-        <div class="saves-section">
-            <h2>存档列表</h2>
-            <div class="save-list" id="saveList">
-                <!-- 存档项会动态生成 -->
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // 核心功能代码
-        // 从本地存储获取存档或使用示例数据
-        let saves = JSON.parse(localStorage.getItem('gameSaves')) || [
-            {
-                id: 1,
-                name: "初始存档",
-                date: new Date().toLocaleString(),
-                data: {
-                    level: 1,
-                    health: 100,
-                    inventory: ["dagger", "bread"]
-                }
-            }
-        ];
-        
-        // DOM元素
-        const saveNameInput = document.getElementById('saveName');
-        const saveDataTextarea = document.getElementById('saveData');
-        const saveBtn = document.getElementById('saveBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const saveList = document.getElementById('saveList');
-        
-        // 初始化存档列表
-        function initSaveList() {
-            saveList.innerHTML = '';
-            
-            if (saves.length === 0) {
-                saveList.innerHTML = '<p>暂无存档</p>';
-                return;
-            }
-            
-            saves.forEach(save => {
-                const saveElement = document.createElement('div');
-                saveElement.className = 'save-item';
-                saveElement.innerHTML = `
-                    <div class="save-header">
-                        <div class="save-name">${save.name}</div>
-                        <div class="save-date">${save.date}</div>
-                    </div>
-                    <div>${JSON.stringify(save.data)}</div>
-                    <div class="save-actions">
-                        <button class="action-btn load-btn" data-id="${save.id}">加载</button>
-                        <button class="action-btn delete-btn" data-id="${save.id}">删除</button>
-                        <button class="action-btn export-btn" data-id="${save.id}">导出TXT</button>
-                    </div>
-                `;
-                saveList.appendChild(saveElement);
-            });
-            
-            // 添加事件监听器
-            document.querySelectorAll('.load-btn').forEach(btn => {
-                btn.addEventListener('click', () => loadSave(parseInt(btn.dataset.id)));
-            });
-            
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', () => deleteSave(parseInt(btn.dataset.id)));
-            });
-            
-            document.querySelectorAll('.export-btn').forEach(btn => {
-                btn.addEventListener('click', () => exportSave(parseInt(btn.dataset.id)));
-            });
-        }
-        
-        // 保存存档
-        saveBtn.addEventListener('click', () => {
-            const name = saveNameInput.value.trim();
-            const dataStr = saveDataTextarea.value.trim();
-            
-            if (!name) {
-                alert('请输入存档名称');
-                return;
-            }
-            
-            if (!dataStr) {
-                alert('请输入存档数据');
-                return;
-            }
-            
-            try {
-                const data = JSON.parse(dataStr);
-                
-                const newSave = {
-                    id: Date.now(),
-                    name: name,
-                    date: new Date().toLocaleString(),
-                    data: data
-                };
-                
-                saves.unshift(newSave);
-                localStorage.setItem('gameSaves', JSON.stringify(saves));
-                initSaveList();
-                
-                saveNameInput.value = '';
-                alert('存档创建成功！');
-            } catch (e) {
-                alert('存档数据格式错误，请输入有效的JSON格式');
-                console.error(e);
-            }
-        });
-        
-        // 清空编辑器
-        clearBtn.addEventListener('click', () => {
-            saveNameInput.value = '';
-            saveDataTextarea.value = '';
-        });
-        
-        // 加载存档
-        function loadSave(id) {
-            const save = saves.find(s => s.id === id);
-            if (save) {
-                saveNameInput.value = save.name;
-                saveDataTextarea.value = JSON.stringify(save.data, null, 2);
-                alert(`已加载存档: ${save.name}`);
-            }
-        }
-        
-        // 删除存档
-        function deleteSave(id) {
-            if (confirm('确定要删除这个存档吗？')) {
-                saves = saves.filter(s => s.id !== id);
-                localStorage.setItem('gameSaves', JSON.stringify(saves));
-                initSaveList();
-            }
-        }
-        
-        // 导出存档为TXT文件
-        function exportSave(id) {
-            const save = saves.find(s => s.id === id);
-            if (save) {
-                const dataStr = JSON.stringify(save.data, null, 2);
-                const blob = new Blob([dataStr], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${save.name.replace(/\s+/g, '_')}_${save.date.replace(/[:\s]/g, '-')}.txt`;
-                document.body.appendChild(a);
-                a.click();
-                
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 100);
-            }
-        }
-        
-        // 初始化存档列表
-        document.addEventListener('DOMContentLoaded', initSaveList);
     </script>
-    
 </body>
 </html>
