@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>游戏存档管理器</title>
+    <title>小游戏乐园</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,226 +14,359 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             color: #fff;
             min-height: 100vh;
             padding: 20px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
         }
         
         .container {
+            max-width: 1200px;
             width: 100%;
-            max-width: 900px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
-            overflow: hidden;
+            margin: 0 auto;
         }
         
         header {
-            background: rgba(0, 0, 0, 0.85);
-            padding: 20px;
             text-align: center;
-            border-bottom: 2px solid #ff5722;
+            padding: 20px 0;
+            margin-bottom: 30px;
         }
         
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 5px;
-            color: #ff5722;
-            text-shadow: 0 0 10px rgba(255, 87, 34, 0.7);
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
         .subtitle {
-            color: #aaa;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
         }
         
-        .content {
+        .games-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            width: 100%;
+        }
+        
+        .tabs {
             display: flex;
-            padding: 20px;
-            gap: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            margin-bottom: 25px;
+            overflow-x: auto;
         }
         
-        .editor-section {
+        .tab {
             flex: 1;
-            background: rgba(30, 30, 40, 0.8);
-            border-radius: 10px;
-            padding: 20px;
+            text-align: center;
+            padding: 15px 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            min-width: 120px;
         }
         
-        .saves-section {
-            flex: 1;
-            background: rgba(30, 30, 40, 0.8);
-            border-radius: 10px;
-            padding: 20px;
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
         
-        .section-title {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: #4fc3f7;
+        .tab.active {
+            background: linear-gradient(45deg, #ff7e5f, #feb47b);
+            border-radius: 15px;
+        }
+        
+        .game-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+            min-height: 500px;
+        }
+        
+        .game-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 井字棋游戏样式 */
+        #tic-tac-toe {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 10px;
+            margin: 30px 0;
+        }
+        
+        .cell {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #bbb;
-        }
-        
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            border-radius: 5px;
-            border: 1px solid #444;
-            background: rgba(10, 10, 20, 0.8);
-            color: #fff;
-            font-size: 1rem;
-        }
-        
-        textarea {
-            min-height: 200px;
-            resize: vertical;
-            font-family: monospace;
-        }
-        
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
+            justify-content: center;
+            font-size: 3rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s ease;
         }
         
-        .btn-primary {
-            background: #ff5722;
-            color: white;
+        .cell:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
         }
         
-        .btn-secondary {
-            background: #4fc3f7;
-            color: #000;
+        .cell.x {
+            color: #ff7e5f;
         }
         
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        .cell.o {
+            color: #42a5f5;
         }
         
-        .btn:active {
-            transform: translateY(0);
-        }
-        
-        .save-list {
-            max-height: 400px;
-            overflow-y: auto;
-            background: rgba(10, 10, 20, 0.8);
-            border-radius: 5px;
-            padding: 10px;
-        }
-        
-        .save-item {
-            padding: 15px;
-            background: rgba(50, 50, 60, 0.6);
-            border-radius: 8px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-left: 3px solid #4fc3f7;
-        }
-        
-        .save-item:hover {
-            background: rgba(70, 70, 90, 0.8);
-            transform: translateX(5px);
-        }
-        
-        .save-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-        
-        .save-name {
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: #ff9800;
-        }
-        
-        .save-date {
-            font-size: 0.85rem;
-            color: #aaa;
-        }
-        
-        .save-preview {
-            font-size: 0.9rem;
-            color: #ccc;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .save-actions {
-            display: flex;
-            gap: 5px;
-            margin-top: 10px;
-        }
-        
-        .action-btn {
-            flex: 1;
-            padding: 5px;
-            border: none;
-            border-radius: 3px;
-            font-size: 0.85rem;
-            cursor: pointer;
-        }
-        
-        .load-btn {
-            background: #8bc34a;
-            color: #000;
-        }
-        
-        .delete-btn {
-            background: #f44336;
-            color: white;
-        }
-        
-        .empty-message {
+        .game-info {
+            margin: 20px 0;
+            font-size: 1.3rem;
             text-align: center;
-            padding: 30px;
-            color: #777;
-            font-style: italic;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #ff7e5f, #feb47b);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        /* 贪吃蛇游戏样式 */
+        #snake-game {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .snake-board {
+            width: 400px;
+            height: 400px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
+            grid-template-rows: repeat(20, 1fr);
+            margin: 20px 0;
+        }
+        
+        .snake-cell {
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .snake {
+            background: #4caf50;
+            border-radius: 3px;
+        }
+        
+        .food {
+            background: #f44336;
+            border-radius: 50%;
+        }
+        
+        /* 记忆匹配游戏样式 */
+        #memory-game {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .memory-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+        
+        .card {
+            width: 100px;
+            height: 130px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            perspective: 1000px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+        }
+        
+        .card-front {
+            background: linear-gradient(45deg, #2196f3, #21cbf3);
+            transform: rotateY(180deg);
+        }
+        
+        .card-back {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* 泡泡射击游戏样式 */
+        #bubble-shooter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .bubble-board {
+            width: 500px;
+            height: 600px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .bubble {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            box-shadow: inset 0 -5px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .shooter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background: #2196f3;
+            border-radius: 50%;
         }
         
         footer {
+            margin-top: 40px;
             text-align: center;
             padding: 20px;
-            color: #aaa;
-            font-size: 0.9rem;
-            background: rgba(0, 0, 0, 0.85);
-            border-top: 1px solid #444;
+            font-size: 1rem;
+            opacity: 0.8;
         }
         
+        /* 响应式设计 */
         @media (max-width: 768px) {
-            .content {
-                flex-direction: column;
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+                padding: 0 15px;
+            }
+            
+            .board {
+                grid-template-columns: repeat(3, 80px);
+            }
+            
+            .cell {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .snake-board {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .bubble-board {
+                width: 100%;
+                max-width: 400px;
+                height: 500px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .board {
+                grid-template-columns: repeat(3, 70px);
+            }
+            
+            .cell {
+                width: 70px;
+                height: 70px;
+                font-size: 2.5rem;
+            }
+            
+            .memory-board {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .card {
+                width: 70px;
+                height: 100px;
+            }
+            
+            .snake-board {
+                width: 280px;
+                height: 280px;
             }
         }
     </style>
@@ -241,265 +374,521 @@
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-gamepad"></i> 游戏存档管理器</h1>
-            <p class="subtitle">创建、加载和管理您的游戏存档文件</p>
+            <h1>小游戏乐园</h1>
+            <p class="subtitle">欢迎来到我们的迷你游戏世界！在这里你可以享受多种经典小游戏，放松心情，挑战自我。</p>
         </header>
         
-        <div class="content">
-            <div class="editor-section">
-                <h2 class="section-title"><i class="fas fa-edit"></i> 存档编辑器</h2>
-                
-                <div class="input-group">
-                    <label for="saveName">存档名称</label>
-                    <input type="text" id="saveName" placeholder="输入存档名称 (例如: 城堡关卡进度)">
+        <div class="games-container">
+            <div class="tabs">
+                <div class="tab active" data-game="tic-tac-toe">
+                    <i class="fas fa-times"></i> 井字棋
                 </div>
-                
-                <div class="input-group">
-                    <label for="saveData">存档数据 (JSON格式)</label>
-                    <textarea id="saveData" placeholder='输入存档数据，例如: {"level": 5, "health": 100, "items": ["sword", "shield"]}'>
-{
-  "player": {
-    "name": "冒险者",
-    "level": 12,
-    "health": 85,
-    "mana": 120
-  },
-  "progress": {
-    "currentLevel": "黑暗城堡",
-    "checkpoint": "城堡大门",
-    "completedLevels": 8
-  },
-  "inventory": {
-    "weapons": ["火焰剑", "冰霜弓"],
-    "armor": ["龙鳞甲"],
-    "items": ["治疗药水 x5", "魔法卷轴 x3"]
-  },
-  "stats": {
-    "enemiesDefeated": 142,
-    "playTime": "15:42:36",
-    "achievements": ["新手冒险家", "屠龙者"]
-  }
-}</textarea>
+                <div class="tab" data-game="snake-game">
+                    <i class="fas fa-snake"></i> 贪吃蛇
                 </div>
-                
-                <div class="btn-group">
-                    <button class="btn btn-primary" id="saveBtn">
-                        <i class="fas fa-save"></i> 保存存档
-                    </button>
-                    <button class="btn btn-secondary" id="clearBtn">
-                        <i class="fas fa-eraser"></i> 清空数据
-                    </button>
+                <div class="tab" data-game="memory-game">
+                    <i class="fas fa-brain"></i> 记忆匹配
+                </div>
+                <div class="tab" data-game="bubble-shooter">
+                    <i class="fas fa-circle"></i> 泡泡射击
                 </div>
             </div>
             
-            <div class="saves-section">
-                <h2 class="section-title"><i class="fas fa-folder-open"></i> 存档列表</h2>
-                
-                <div class="save-list" id="saveList">
-                    <div class="empty-message">
-                        <i class="fas fa-inbox"></i><br>
-                        暂无存档<br>
-                        <small>创建新存档后将显示在这里</small>
-                    </div>
+            <!-- 井字棋游戏 -->
+            <div id="tic-tac-toe" class="game-content active">
+                <div class="game-info" id="tic-tac-toe-info">玩家 X 的回合</div>
+                <div class="board" id="tic-tac-toe-board">
+                    <div class="cell" data-index="0"></div>
+                    <div class="cell" data-index="1"></div>
+                    <div class="cell" data-index="2"></div>
+                    <div class="cell" data-index="3"></div>
+                    <div class="cell" data-index="4"></div>
+                    <div class="cell" data-index="5"></div>
+                    <div class="cell" data-index="6"></div>
+                    <div class="cell" data-index="7"></div>
+                    <div class="cell" data-index="8"></div>
+                </div>
+                <div class="controls">
+                    <button id="reset-tic-tac-toe">重新开始</button>
+                    <button id="change-mode">单人模式</button>
+                </div>
+            </div>
+            
+            <!-- 贪吃蛇游戏 -->
+            <div id="snake-game" class="game-content">
+                <div class="game-info" id="snake-info">得分: <span id="snake-score">0</span></div>
+                <div class="snake-board" id="snake-board"></div>
+                <div class="controls">
+                    <button id="start-snake">开始游戏</button>
+                    <button id="pause-snake">暂停</button>
+                </div>
+            </div>
+            
+            <!-- 记忆匹配游戏 -->
+            <div id="memory-game" class="game-content">
+                <div class="game-info" id="memory-info">匹配卡片，找出所有相同的对！</div>
+                <div class="memory-board" id="memory-board"></div>
+                <div class="controls">
+                    <button id="start-memory">开始新游戏</button>
+                </div>
+            </div>
+            
+            <!-- 泡泡射击游戏 -->
+            <div id="bubble-shooter" class="game-content">
+                <div class="game-info" id="bubble-info">射击泡泡，匹配颜色！</div>
+                <div class="bubble-board" id="bubble-board">
+                    <div class="shooter"></div>
+                </div>
+                <div class="controls">
+                    <button id="start-bubble">开始游戏</button>
                 </div>
             </div>
         </div>
         
         <footer>
-            <p>游戏存档管理器 v1.0 | 存档数据将保存为TXT文件 | 导入到您的游戏网站即可使用</p>
+            <p>© 2023 小游戏乐园 | 用 ❤️ 制作的趣味游戏网站</p>
         </footer>
     </div>
-
+    
     <script>
-        // 示例存档数据
-        const sampleSaves = [
-            {
-                id: 1,
-                name: "初始存档",
-                date: "2023-06-15 14:30",
-                data: {
-                    level: 1,
-                    health: 100,
-                    gold: 50,
-                    items: ["短剑", "小盾牌"]
-                }
-            },
-            {
-                id: 2,
-                name: "森林关卡完成",
-                date: "2023-06-18 20:15",
-                data: {
-                    level: 5,
-                    health: 85,
-                    gold: 320,
-                    items: ["长弓", "皮甲", "治疗药水 x3"]
-                }
-            },
-            {
-                id: 3,
-                name: "火山BOSS战前",
-                date: "2023-06-20 09:42",
-                data: {
-                    level: 12,
-                    health: 100,
-                    gold: 780,
-                    items: ["火焰剑", "龙鳞甲", "高级治疗药水 x5", "防火戒指"]
-                }
-            }
+        // 游戏切换逻辑
+        const tabs = document.querySelectorAll('.tab');
+        const gameContents = document.querySelectorAll('.game-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有活动标签
+                tabs.forEach(t => t.classList.remove('active'));
+                // 添加活动类到当前标签
+                tab.classList.add('active');
+                
+                // 隐藏所有游戏内容
+                gameContents.forEach(content => content.classList.remove('active'));
+                
+                // 显示当前游戏内容
+                const gameId = tab.getAttribute('data-game');
+                document.getElementById(gameId).classList.add('active');
+            });
+        });
+        
+        // 井字棋游戏逻辑
+        const ticTacToeBoard = document.getElementById('tic-tac-toe-board');
+        const ticTacToeInfo = document.getElementById('tic-tac-toe-info');
+        const resetTicTacToeBtn = document.getElementById('reset-tic-tac-toe');
+        const changeModeBtn = document.getElementById('change-mode');
+        
+        let currentPlayer = 'X';
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];
+        let gameActive = true;
+        let singlePlayerMode = false;
+        
+        const winningConditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // 行
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // 列
+            [0, 4, 8], [2, 4, 6]             // 对角线
         ];
         
-        // 当前存档列表
-        let saves = JSON.parse(localStorage.getItem('gameSaves')) || sampleSaves;
-        
-        // DOM元素
-        const saveNameInput = document.getElementById('saveName');
-        const saveDataTextarea = document.getElementById('saveData');
-        const saveBtn = document.getElementById('saveBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const saveList = document.getElementById('saveList');
-        
-        // 初始化存档列表
-        function initSaveList() {
-            if (saves.length === 0) {
-                saveList.innerHTML = `
-                    <div class="empty-message">
-                        <i class="fas fa-inbox"></i><br>
-                        暂无存档<br>
-                        <small>创建新存档后将显示在这里</small>
-                    </div>
-                `;
+        function handleCellClick(e) {
+            const cell = e.target;
+            const index = parseInt(cell.getAttribute('data-index'));
+            
+            if (gameBoard[index] !== '' || !gameActive) return;
+            
+            gameBoard[index] = currentPlayer;
+            cell.textContent = currentPlayer;
+            cell.classList.add(currentPlayer.toLowerCase());
+            
+            if (checkWin()) {
+                ticTacToeInfo.textContent = `玩家 ${currentPlayer} 获胜！`;
+                gameActive = false;
                 return;
             }
             
-            saveList.innerHTML = '';
-            saves.forEach(save => {
-                const saveElement = document.createElement('div');
-                saveElement.className = 'save-item';
-                saveElement.innerHTML = `
-                    <div class="save-header">
-                        <div class="save-name">${save.name}</div>
-                        <div class="save-date">${save.date}</div>
-                    </div>
-                    <div class="save-preview">${JSON.stringify(save.data)}</div>
-                    <div class="save-actions">
-                        <button class="action-btn load-btn" data-id="${save.id}">
-                            <i class="fas fa-download"></i> 加载
-                        </button>
-                        <button class="action-btn delete-btn" data-id="${save.id}">
-                            <i class="fas fa-trash"></i> 删除
-                        </button>
-                        <button class="action-btn export-btn" data-id="${save.id}" style="background: #ff9800; color: #000;">
-                            <i class="fas fa-file-export"></i> 导出
-                        </button>
-                    </div>
-                `;
-                saveList.appendChild(saveElement);
+            if (checkDraw()) {
+                ticTacToeInfo.textContent = '平局！';
+                gameActive = false;
+                return;
+            }
+            
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            ticTacToeInfo.textContent = `玩家 ${currentPlayer} 的回合`;
+            
+            // 如果是单人模式且轮到电脑
+            if (singlePlayerMode && currentPlayer === 'O' && gameActive) {
+                setTimeout(computerMove, 500);
+            }
+        }
+        
+        function computerMove() {
+            // 简单的AI逻辑 - 随机选择空位
+            let emptyCells = [];
+            gameBoard.forEach((cell, index) => {
+                if (cell === '') emptyCells.push(index);
             });
             
-            // 添加事件监听器
-            document.querySelectorAll('.load-btn').forEach(btn => {
-                btn.addEventListener('click', () => loadSave(parseInt(btn.dataset.id)));
-            });
-            
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', () => deleteSave(parseInt(btn.dataset.id)));
-            });
-            
-            document.querySelectorAll('.export-btn').forEach(btn => {
-                btn.addEventListener('click', () => exportSave(parseInt(btn.dataset.id)));
+            if (emptyCells.length > 0) {
+                const randomIndex = Math.floor(Math.random() * emptyCells.length);
+                const cellIndex = emptyCells[randomIndex];
+                
+                gameBoard[cellIndex] = 'O';
+                const cell = document.querySelector(`.cell[data-index="${cellIndex}"]`);
+                cell.textContent = 'O';
+                cell.classList.add('o');
+                
+                if (checkWin()) {
+                    ticTacToeInfo.textContent = '电脑获胜！';
+                    gameActive = false;
+                    return;
+                }
+                
+                if (checkDraw()) {
+                    ticTacToeInfo.textContent = '平局！';
+                    gameActive = false;
+                    return;
+                }
+                
+                currentPlayer = 'X';
+                ticTacToeInfo.textContent = `玩家 ${currentPlayer} 的回合`;
+            }
+        }
+        
+        function checkWin() {
+            return winningConditions.some(condition => {
+                return condition.every(index => {
+                    return gameBoard[index] === currentPlayer;
+                });
             });
         }
         
-        // 保存存档
-        saveBtn.addEventListener('click', () => {
-            const name = saveNameInput.value.trim();
-            const dataStr = saveDataTextarea.value.trim();
+        function checkDraw() {
+            return gameBoard.every(cell => cell !== '');
+        }
+        
+        function resetGame() {
+            gameBoard = ['', '', '', '', '', '', '', '', ''];
+            gameActive = true;
+            currentPlayer = 'X';
+            ticTacToeInfo.textContent = `玩家 ${currentPlayer} 的回合`;
             
-            if (!name) {
-                alert('请输入存档名称');
-                return;
-            }
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('x', 'o');
+            });
+        }
+        
+        function toggleGameMode() {
+            singlePlayerMode = !singlePlayerMode;
+            changeModeBtn.textContent = singlePlayerMode ? '双人模式' : '单人模式';
+            resetGame();
+        }
+        
+        ticTacToeBoard.addEventListener('click', handleCellClick);
+        resetTicTacToeBtn.addEventListener('click', resetGame);
+        changeModeBtn.addEventListener('click', toggleGameMode);
+        
+        // 贪吃蛇游戏逻辑
+        const snakeBoard = document.getElementById('snake-board');
+        const snakeInfo = document.getElementById('snake-info');
+        const snakeScore = document.getElementById('snake-score');
+        const startSnakeBtn = document.getElementById('start-snake');
+        const pauseSnakeBtn = document.getElementById('pause-snake');
+        
+        let snake = [];
+        let food = {};
+        let direction = 'right';
+        let nextDirection = 'right';
+        let score = 0;
+        let gameInterval;
+        let gamePaused = true;
+        
+        function initSnakeGame() {
+            // 清空游戏板
+            snakeBoard.innerHTML = '';
             
-            if (!dataStr) {
-                alert('请输入存档数据');
-                return;
-            }
+            // 初始化蛇
+            snake = [
+                {x: 10, y: 10},
+                {x: 9, y: 10},
+                {x: 8, y: 10}
+            ];
             
-            try {
-                const data = JSON.parse(dataStr);
-                
-                const newSave = {
-                    id: Date.now(),
-                    name: name,
-                    date: new Date().toLocaleString(),
-                    data: data
+            // 初始化食物
+            generateFood();
+            
+            // 初始化方向
+            direction = 'right';
+            nextDirection = 'right';
+            
+            // 初始化分数
+            score = 0;
+            snakeScore.textContent = score;
+            
+            // 绘制蛇和食物
+            drawSnake();
+            drawFood();
+        }
+        
+        function drawSnake() {
+            // 移除旧的蛇
+            document.querySelectorAll('.snake').forEach(el => el.remove());
+            
+            // 绘制新的蛇
+            snake.forEach((segment, index) => {
+                const snakeElement = document.createElement('div');
+                snakeElement.classList.add('snake-cell', 'snake');
+                snakeElement.style.gridRow = segment.y;
+                snakeElement.style.gridColumn = segment.x;
+                snakeBoard.appendChild(snakeElement);
+            });
+        }
+        
+        function drawFood() {
+            // 移除旧的食物
+            document.querySelectorAll('.food').forEach(el => el.remove());
+            
+            // 绘制新的食物
+            const foodElement = document.createElement('div');
+            foodElement.classList.add('snake-cell', 'food');
+            foodElement.style.gridRow = food.y;
+            foodElement.style.gridColumn = food.x;
+            snakeBoard.appendChild(foodElement);
+        }
+        
+        function generateFood() {
+            let newFood;
+            let overlapping;
+            
+            do {
+                overlapping = false;
+                newFood = {
+                    x: Math.floor(Math.random() * 20) + 1,
+                    y: Math.floor(Math.random() * 20) + 1
                 };
                 
-                saves.unshift(newSave);
-                localStorage.setItem('gameSaves', JSON.stringify(saves));
-                initSaveList();
+                // 检查食物是否与蛇重叠
+                for (let segment of snake) {
+                    if (segment.x === newFood.x && segment.y === newFood.y) {
+                        overlapping = true;
+                        break;
+                    }
+                }
+            } while (overlapping);
+            
+            food = newFood;
+        }
+        
+        function moveSnake() {
+            if (gamePaused) return;
+            
+            direction = nextDirection;
+            
+            // 创建新的蛇头
+            const head = {...snake[0]};
+            
+            switch (direction) {
+                case 'up':
+                    head.y -= 1;
+                    break;
+                case 'down':
+                    head.y += 1;
+                    break;
+                case 'left':
+                    head.x -= 1;
+                    break;
+                case 'right':
+                    head.x += 1;
+                    break;
+            }
+            
+            // 检查是否撞墙
+            if (head.x < 1 || head.x > 20 || head.y < 1 || head.y > 20) {
+                gameOver();
+                return;
+            }
+            
+            // 检查是否撞到自己
+            for (let i = 0; i < snake.length; i++) {
+                if (snake[i].x === head.x && snake[i].y === head.y) {
+                    gameOver();
+                    return;
+                }
+            }
+            
+            // 添加新的蛇头
+            snake.unshift(head);
+            
+            // 检查是否吃到食物
+            if (head.x === food.x && head.y === food.y) {
+                // 增加分数
+                score += 10;
+                snakeScore.textContent = score;
                 
-                saveNameInput.value = '';
-                saveDataTextarea.value = '';
-                
-                alert('存档创建成功！');
-            } catch (e) {
-                alert('存档数据格式错误，请输入有效的JSON格式');
-                console.error(e);
+                // 生成新食物
+                generateFood();
+            } else {
+                // 如果没吃到食物，移除蛇尾
+                snake.pop();
+            }
+            
+            // 重绘游戏
+            drawSnake();
+            drawFood();
+        }
+        
+        function gameOver() {
+            clearInterval(gameInterval);
+            gamePaused = true;
+            snakeInfo.textContent = `游戏结束！最终得分: ${score}`;
+        }
+        
+        function startGame() {
+            if (!gamePaused) return;
+            
+            initSnakeGame();
+            gamePaused = false;
+            snakeInfo.textContent = "游戏进行中... 使用方向键控制";
+            
+            gameInterval = setInterval(moveSnake, 150);
+        }
+        
+        function togglePause() {
+            gamePaused = !gamePaused;
+            pauseSnakeBtn.textContent = gamePaused ? '继续' : '暂停';
+            
+            if (!gamePaused) {
+                snakeInfo.textContent = "游戏进行中... 使用方向键控制";
+            } else {
+                snakeInfo.textContent = "游戏已暂停";
+            }
+        }
+        
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
+            if (gamePaused) return;
+            
+            switch (e.key) {
+                case 'ArrowUp':
+                    if (direction !== 'down') nextDirection = 'up';
+                    break;
+                case 'ArrowDown':
+                    if (direction !== 'up') nextDirection = 'down';
+                    break;
+                case 'ArrowLeft':
+                    if (direction !== 'right') nextDirection = 'left';
+                    break;
+                case 'ArrowRight':
+                    if (direction !== 'left') nextDirection = 'right';
+                    break;
             }
         });
         
-        // 清空编辑器
-        clearBtn.addEventListener('click', () => {
-            if (confirm('确定要清空当前编辑的内容吗？')) {
-                saveNameInput.value = '';
-                saveDataTextarea.value = '';
-            }
-        });
+        startSnakeBtn.addEventListener('click', startGame);
+        pauseSnakeBtn.addEventListener('click', togglePause);
         
-        // 加载存档
-        function loadSave(id) {
-            const save = saves.find(s => s.id === id);
-            if (save) {
-                saveNameInput.value = save.name;
-                saveDataTextarea.value = JSON.stringify(save.data, null, 2);
-                alert(`已加载存档: ${save.name}`);
-            }
-        }
+        // 初始化贪吃蛇游戏板
+        initSnakeGame();
         
-        // 删除存档
-        function deleteSave(id) {
-            if (confirm('确定要删除这个存档吗？此操作不可恢复。')) {
-                saves = saves.filter(s => s.id !== id);
-                localStorage.setItem('gameSaves', JSON.stringify(saves));
-                initSaveList();
-            }
-        }
+        // 记忆匹配游戏逻辑
+        const memoryBoard = document.getElementById('memory-board');
+        const memoryInfo = document.getElementById('memory-info');
+        const startMemoryBtn = document.getElementById('start-memory');
         
-        // 导出存档为TXT文件
-        function exportSave(id) {
-            const save = saves.find(s => s.id === id);
-            if (save) {
-                const dataStr = JSON.stringify(save.data, null, 2);
-                const blob = new Blob([dataStr], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
+        const cards = ['🍎', '🍌', '🍒', '🍇', '🍊', '🍓', '🍑', '🍍'];
+        let memoryCards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let canFlip = true;
+        
+        function initMemoryGame() {
+            // 清空游戏板
+            memoryBoard.innerHTML = '';
+            flippedCards = [];
+            matchedPairs = 0;
+            canFlip = true;
+            
+            // 创建卡片数组（每张卡片出现两次）
+            memoryCards = [...cards, ...cards];
+            
+            // 随机排序
+            memoryCards.sort(() => Math.random() - 0.5);
+            
+            // 创建卡片元素
+            memoryCards.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.index = index;
                 
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${save.name.replace(/\s+/g, '_')}_${save.date.replace(/[:\s]/g, '-')}.txt`;
-                document.body.appendChild(a);
-                a.click();
+                card.innerHTML = `
+                    <div class="card-face card-back"></div>
+                    <div class="card-face card-front">${emoji}</div>
+                `;
                 
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 100);
+                card.addEventListener('click', flipCard);
+                memoryBoard.appendChild(card);
+            });
+            
+            memoryInfo.textContent = "匹配卡片，找出所有相同的对！";
+        }
+        
+        function flipCard() {
+            if (!canFlip) return;
+            
+            const card = this;
+            
+            // 如果卡片已经翻开或已经匹配，则忽略点击
+            if (card.classList.contains('flipped') || flippedCards.length >= 2) {
+                return;
+            }
+            
+            // 翻开卡片
+            card.classList.add('flipped');
+            flippedCards.push(card);
+            
+            // 如果翻开了两张卡片
+            if (flippedCards.length === 2) {
+                canFlip = false;
+                
+                const card1 = flippedCards[0];
+                const card2 = flippedCards[1];
+                
+                // 检查是否匹配
+                if (card1.querySelector('.card-front').textContent === card2.querySelector('.card-front').textContent) {
+                    // 匹配成功
+                    setTimeout(() => {
+                        card1.style.visibility = 'hidden';
+                        card2.style.visibility = 'hidden';
+                        flippedCards = [];
+                        canFlip = true;
+                        matchedPairs++;
+                        
+                        if (matchedPairs === cards.length) {
+                            memoryInfo.textContent = "恭喜！你找到了所有匹配对！";
+                        }
+                    }, 500);
+                } else {
+                    // 不匹配，翻回卡片
+                    setTimeout(() => {
+                        card1.classList.remove('flipped');
+                        card2.classList.remove('flipped');
+                        flippedCards = [];
+                        canFlip = true;
+                    }, 1000);
+                }
             }
         }
         
-        // 初始化
-        document.addEventListener('DOMContentLoaded', () => {
-            initSaveList();
+        startMemoryBtn.addEventListener('click', initMemoryGame);
+        
+        // 初始化记忆匹配游戏
+        initMemoryGame();
+        
+        // 泡泡射击游戏逻辑
+        const bubbleBoard = document.getElementById('bubble-board');
+        const bubbleInfo = document.getElementById('bubble-info');
+        const startBubbleBtn = document.getElementById('start-bubble');
+        
+        startBubbleBtn.addEventListener('click', () => {
+            bubbleInfo.textContent = "游戏即将开始！";
         });
     </script>
 </body>
