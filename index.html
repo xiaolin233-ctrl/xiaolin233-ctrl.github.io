@@ -1,592 +1,136 @@
+<!-- index.html - 前端界面 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>简单动态网站 - 用户留言板</title>
+    <title>BlogSite - 动态分享</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 20px;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-        }
-        
-        .tagline {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-        
-        .main-content {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        
-        .form-section {
-            flex: 1;
-            min-width: 300px;
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-        }
-        
-        .messages-section {
-            flex: 2;
-            min-width: 300px;
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-        }
-        
-        h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #444;
-        }
-        
-        input, textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border 0.3s;
-        }
-        
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #6a11cb;
-            box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.2);
-        }
-        
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-        
-        button {
-            background: linear-gradient(to right, #6a11cb, #2575fc);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 7px 14px rgba(106, 17, 203, 0.25);
-        }
-        
-        .message-list {
-            max-height: 500px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-        
-        .message-item {
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-            border-left: 4px solid #2575fc;
-            transition: all 0.3s;
-        }
-        
-        .message-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        .message-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .message-author {
-            font-weight: bold;
-            color: #2c3e50;
-            font-size: 18px;
-        }
-        
-        .message-time {
-            color: #7f8c8d;
-            font-size: 14px;
-        }
-        
-        .message-content {
-            color: #555;
-            margin-bottom: 15px;
-        }
-        
-        .delete-btn {
-            background: #ff4757;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
-        }
-        
-        .delete-btn:hover {
-            background: #ff3742;
-        }
-        
-        .empty-message {
-            text-align: center;
-            color: #7f8c8d;
-            padding: 40px 20px;
-            font-style: italic;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-        }
-        
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #6a11cb;
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            color: #7f8c8d;
-            margin-top: 5px;
-        }
-        
-        @media (max-width: 768px) {
-            .main-content {
-                flex-direction: column;
-            }
-            
-            h1 {
-                font-size: 2.2rem;
-            }
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-comments"></i> 用户留言板</h1>
-            <p class="tagline">分享您的想法，与其他用户互动</p>
-        </header>
-        
-        <div class="stats">
-            <div class="stat-item">
-                <div class="stat-number" id="total-messages">0</div>
-                <div class="stat-label">总留言数</div>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <h1>📝 BlogSite</h1>
             </div>
-            <div class="stat-item">
-                <div class="stat-number" id="today-messages">0</div>
-                <div class="stat-label">今日留言</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="active-users">0</div>
-                <div class="stat-label">活跃用户</div>
+            <div class="nav-menu">
+                <a href="#" class="nav-link active"><i class="fas fa-home"></i> 首页</a>
+                <a href="#" class="nav-link"><i class="fas fa-user"></i> 个人中心</a>
+                <a href="#" class="nav-link"><i class="fas fa-cog"></i> 设置</a>
+                <div class="user-avatar">
+                    <img src="https://ui-avatars.com/api/?name=用户" alt="用户头像">
+                </div>
             </div>
         </div>
-        
-        <div class="main-content">
-            <section class="form-section">
-                <h2><i class="fas fa-edit"></i> 发表留言</h2>
-                <form id="messageForm">
-                    <div class="form-group">
-                        <label for="name">您的姓名</label>
-                        <input type="text" id="name" placeholder="请输入姓名" required>
+    </nav>
+
+    <div class="container">
+        <!-- 左侧边栏 -->
+        <aside class="sidebar">
+            <div class="user-card">
+                <img src="https://ui-avatars.com/api/?name=张三&size=80" alt="用户头像" class="user-avatar-large">
+                <h3>张三</h3>
+                <p>@zhangsan</p>
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">42</span>
+                        <span class="stat-label">动态</span>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="message">留言内容</label>
-                        <textarea id="message" placeholder="请输入留言内容..." required></textarea>
+                    <div class="stat-item">
+                        <span class="stat-number">128</span>
+                        <span class="stat-label">关注</span>
                     </div>
-                    
-                    <button type="submit">
-                        <i class="fas fa-paper-plane"></i> 发布留言
-                    </button>
-                </form>
-            </section>
-            
-            <section class="messages-section">
-                <h2><i class="fas fa-list"></i> 最新留言 <span id="message-count">(0)</span></h2>
-                <div class="message-list" id="messageList">
-                    <div class="empty-message">
-                        <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
-                        <p>暂无留言，快来发表第一条留言吧！</p>
+                    <div class="stat-item">
+                        <span class="stat-number">89</span>
+                        <span class="stat-label">粉丝</span>
                     </div>
                 </div>
-            </section>
-        </div>
-        
-        <footer>
-            <p>© 2023 简单动态网站示例 | 用户留言板系统 | 本示例使用HTML/CSS/JavaScript和模拟后端API</p>
-        </footer>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a href="#" class="menu-item"><i class="fas fa-newspaper"></i> 我的动态</a>
+                <a href="#" class="menu-item"><i class="fas fa-heart"></i> 点赞</a>
+                <a href="#" class="menu-item"><i class="fas fa-comments"></i> 评论</a>
+                <a href="#" class="menu-item"><i class="fas fa-images"></i> 相册</a>
+                <a href="#" class="menu-item"><i class="fas fa-users"></i> 好友</a>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 发布动态表单 -->
+            <div class="post-form">
+                <div class="form-header">
+                    <h3>分享新鲜事</h3>
+                </div>
+                <textarea id="postContent" placeholder="此刻的想法..." rows="3"></textarea>
+                <div class="form-actions">
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="openImageUpload()">
+                            <i class="fas fa-image"></i> 图片
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-smile"></i> 表情
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-map-marker-alt"></i> 位置
+                        </button>
+                    </div>
+                    <button class="post-btn" onclick="createPost()">发布</button>
+                </div>
+                <div id="imagePreview" class="image-preview"></div>
+            </div>
+
+            <!-- 动态列表 -->
+            <div id="postsContainer" class="posts-container">
+                <!-- 动态将通过JavaScript动态加载 -->
+                <div class="loading">加载中...</div>
+            </div>
+        </main>
+
+        <!-- 右侧边栏 -->
+        <aside class="right-sidebar">
+            <div class="trending">
+                <h3>热门话题</h3>
+                <ul>
+                    <li># 今日心情</li>
+                    <li># 美食分享</li>
+                    <li># 旅行日记</li>
+                    <li># 学习打卡</li>
+                </ul>
+            </div>
+            
+            <div class="online-users">
+                <h3>在线好友</h3>
+                <div class="user-list">
+                    <div class="online-user">
+                        <span class="online-dot"></span>
+                        <span>李四</span>
+                    </div>
+                    <div class="online-user">
+                        <span class="online-dot"></span>
+                        <span>王五</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
     </div>
 
-    <script>
-        // 模拟后端API URL
-        const API_BASE_URL = 'https://jsonplaceholder.typicode.com';
-        
-        // 初始化留言数据（模拟从数据库获取）
-        let messages = JSON.parse(localStorage.getItem('messages')) || [
-            {
-                id: 1,
-                name: "张明",
-                message: "这个留言板设计得很棒，界面简洁美观！",
-                time: "2023-10-15 14:30"
-            },
-            {
-                id: 2,
-                name: "李娜",
-                message: "动态网站开发真的很有趣，希望能学习更多前端技术。",
-                time: "2023-10-16 09:15"
-            },
-            {
-                id: 3,
-                name: "王伟",
-                message: "感谢分享这个示例，对我学习网站开发很有帮助！",
-                time: "2023-10-17 16:45"
-            }
-        ];
-        
-        // 模拟用户数据
-        let users = ['张明', '李娜', '王伟', '刘芳', '陈浩'];
-        
-        // DOM元素
-        const messageForm = document.getElementById('messageForm');
-        const messageList = document.getElementById('messageList');
-        const messageCount = document.getElementById('message-count');
-        const totalMessagesEl = document.getElementById('total-messages');
-        const todayMessagesEl = document.getElementById('today-messages');
-        const activeUsersEl = document.getElementById('active-users');
-        
-        // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 从localStorage加载数据
-            loadMessages();
-            
-            // 更新统计数据
-            updateStats();
-            
-            // 设置表单提交事件
-            messageForm.addEventListener('submit', handleFormSubmit);
-            
-            // 模拟从服务器获取用户数据
-            setTimeout(() => {
-                activeUsersEl.textContent = users.length;
-            }, 500);
-        });
-        
-        // 加载留言
-        function loadMessages() {
-            // 清空留言列表
-            messageList.innerHTML = '';
-            
-            if (messages.length === 0) {
-                messageList.innerHTML = `
-                    <div class="empty-message">
-                        <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
-                        <p>暂无留言，快来发表第一条留言吧！</p>
-                    </div>
-                `;
-                messageCount.textContent = '(0)';
-                return;
-            }
-            
-            // 更新留言计数
-            messageCount.textContent = `(${messages.length})`;
-            
-            // 按时间倒序排列（最新的在前面）
-            const sortedMessages = [...messages].sort((a, b) => new Date(b.time) - new Date(a.time));
-            
-            // 渲染留言列表
-            sortedMessages.forEach(msg => {
-                const messageItem = document.createElement('div');
-                messageItem.className = 'message-item';
-                messageItem.dataset.id = msg.id;
-                
-                messageItem.innerHTML = `
-                    <div class="message-header">
-                        <div class="message-author">
-                            <i class="fas fa-user-circle"></i> ${msg.name}
-                        </div>
-                        <div class="message-time">
-                            <i class="far fa-clock"></i> ${msg.time}
-                        </div>
-                    </div>
-                    <div class="message-content">
-                        ${msg.message}
-                    </div>
-                    <button class="delete-btn" onclick="deleteMessage(${msg.id})">
-                        <i class="fas fa-trash"></i> 删除留言
-                    </button>
-                `;
-                
-                messageList.appendChild(messageItem);
-            });
-        }
-        
-        // 处理表单提交
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            
-            const nameInput = document.getElementById('name');
-            const messageInput = document.getElementById('message');
-            
-            const name = nameInput.value.trim();
-            const message = messageInput.value.trim();
-            
-            if (!name || !message) {
-                alert('请填写姓名和留言内容！');
-                return;
-            }
-            
-            // 创建新留言对象
-            const newMessage = {
-                id: messages.length > 0 ? Math.max(...messages.map(m => m.id)) + 1 : 1,
-                name: name,
-                message: message,
-                time: getCurrentTime()
-            };
-            
-            // 模拟发送到服务器
-            simulateApiCall('POST', `${API_BASE_URL}/posts`, newMessage)
-                .then(response => {
-                    // 添加到留言数组
-                    messages.push(newMessage);
-                    
-                    // 保存到localStorage（模拟数据库）
-                    localStorage.setItem('messages', JSON.stringify(messages));
-                    
-                    // 重新加载留言
-                    loadMessages();
-                    
-                    // 更新统计数据
-                    updateStats();
-                    
-                    // 重置表单
-                    messageForm.reset();
-                    
-                    // 显示成功消息
-                    showNotification('留言发布成功！', 'success');
-                    
-                    // 如果用户是新用户，添加到用户列表
-                    if (!users.includes(name)) {
-                        users.push(name);
-                        activeUsersEl.textContent = users.length;
-                    }
-                })
-                .catch(error => {
-                    console.error('发布留言失败:', error);
-                    showNotification('留言发布失败，请稍后重试！', 'error');
-                });
-        }
-        
-        // 删除留言
-        function deleteMessage(id) {
-            if (!confirm('确定要删除这条留言吗？')) {
-                return;
-            }
-            
-            // 模拟发送删除请求到服务器
-            simulateApiCall('DELETE', `${API_BASE_URL}/posts/${id}`)
-                .then(response => {
-                    // 从留言数组中移除
-                    messages = messages.filter(msg => msg.id !== id);
-                    
-                    // 保存到localStorage
-                    localStorage.setItem('messages', JSON.stringify(messages));
-                    
-                    // 重新加载留言
-                    loadMessages();
-                    
-                    // 更新统计数据
-                    updateStats();
-                    
-                    // 显示成功消息
-                    showNotification('留言删除成功！', 'success');
-                })
-                .catch(error => {
-                    console.error('删除留言失败:', error);
-                    showNotification('留言删除失败，请稍后重试！', 'error');
-                });
-        }
-        
-        // 更新统计数据
-        function updateStats() {
-            totalMessagesEl.textContent = messages.length;
-            
-            // 计算今日留言数
-            const today = new Date().toISOString().split('T')[0];
-            const todayCount = messages.filter(msg => msg.time.startsWith(today)).length;
-            todayMessagesEl.textContent = todayCount;
-        }
-        
-        // 获取当前时间
-        function getCurrentTime() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            
-            return `${year}-${month}-${day} ${hours}:${minutes}`;
-        }
-        
-        // 模拟API调用
-        function simulateApiCall(method, url, data = null) {
-            return new Promise((resolve, reject) => {
-                // 模拟网络延迟
-                setTimeout(() => {
-                    // 模拟成功响应
-                    const response = {
-                        status: 200,
-                        data: data || { success: true }
-                    };
-                    
-                    // 90%的成功率
-                    if (Math.random() < 0.9) {
-                        resolve(response);
-                    } else {
-                        reject(new Error('模拟API调用失败'));
-                    }
-                }, 300);
-            });
-        }
-        
-        // 显示通知
-        function showNotification(message, type = 'info') {
-            // 创建通知元素
-            const notification = document.createElement('div');
-            notification.textContent = message;
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 25px;
-                border-radius: 8px;
-                color: white;
-                font-weight: 600;
-                z-index: 1000;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-                animation: slideIn 0.3s ease-out;
-                background-color: ${type === 'success' ? '#2ed573' : '#ff4757'};
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // 3秒后移除通知
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease-out';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
-        
-        // 添加CSS动画
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-            
-            @keyframes slideOut {
-                from {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-                to {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
+    <!-- 模态框 - 评论 -->
+    <div id="commentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalPostContent"></div>
+            <div class="comment-form">
+                <textarea id="commentText" placeholder="写下你的评论..."></textarea>
+                <button onclick="submitComment()">评论</button>
+            </div>
+            <div id="commentsList" class="comments-list"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html>
