@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>六爻占卜 - 周易六十四卦</title>
+    <title>六爻占卜 · 周易六十四卦</title>
     <style>
         :root {
             --bg: #1a1a1f;
@@ -21,9 +21,9 @@
             --accent: #c9a96e;
             --danger: #c0392b;
             --success: #6b9b6b;
-            --radius: 10px;
-            --radius-sm: 6px;
-            --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -91,7 +91,7 @@
             margin-top: 4px;
         }
 
-        /* Main card */
+        /* Cards */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -122,11 +122,11 @@
             opacity: 0.6;
         }
 
-        /* Yao lines selector */
+        /* Yao selector */
         .yao-selector {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
         .yao-row {
@@ -134,7 +134,7 @@
             align-items: center;
             gap: 14px;
             width: 100%;
-            max-width: 420px;
+            max-width: 440px;
             cursor: pointer;
             padding: 10px 16px;
             border-radius: var(--radius-sm);
@@ -143,11 +143,10 @@
             border: 1px solid transparent;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            position: relative;
         }
         .yao-row:hover {
             background: rgba(201, 169, 110, 0.06);
-            border-color: rgba(201, 169, 110, 0.2);
+            border-color: rgba(201, 169, 110, 0.25);
         }
         .yao-row:active {
             background: rgba(201, 169, 110, 0.12);
@@ -169,21 +168,19 @@
             justify-content: center;
             align-items: center;
             min-height: 42px;
-            transition: var(--transition);
         }
         .yao-symbol {
             font-size: 1.8rem;
-            letter-spacing: 0.1em;
-            transition: var(--transition);
+            letter-spacing: 0.08em;
             font-weight: bold;
         }
         .yao-symbol.yang {
             color: var(--yang);
-            text-shadow: 0 0 8px rgba(232, 213, 163, 0.3);
+            text-shadow: 0 0 8px rgba(232, 213, 163, 0.35);
         }
         .yao-symbol.yin {
             color: var(--yin);
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
         }
         .yao-indicator {
             width: 36px;
@@ -209,7 +206,7 @@
             border: none;
         }
 
-        /* Result section */
+        /* Result area */
         .result-area {
             text-align: center;
             margin-top: 8px;
@@ -217,7 +214,7 @@
             border-top: 1px solid var(--border);
         }
         .gua-name {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: var(--gold-light);
             letter-spacing: 0.08em;
@@ -254,7 +251,7 @@
             gap: 3px;
             margin: 16px 0;
             padding: 14px 0;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.25);
             border-radius: var(--radius-sm);
         }
         .hex-line {
@@ -270,27 +267,27 @@
             transition: var(--transition);
         }
         .hex-line.yang .bar {
-            width: 100px;
+            width: 110px;
             background: var(--yang);
-            box-shadow: 0 0 6px rgba(232, 213, 163, 0.3);
+            box-shadow: 0 0 8px rgba(232, 213, 163, 0.4);
         }
         .hex-line.yin .bar-left,
         .hex-line.yin .bar-right {
-            width: 40px;
+            width: 44px;
             height: 5px;
             border-radius: 3px;
             background: var(--yin);
-            box-shadow: 0 0 4px rgba(160, 176, 192, 0.25);
+            box-shadow: 0 0 4px rgba(160, 176, 192, 0.3);
         }
         .hex-line.yin .gap {
-            width: 20px;
+            width: 22px;
         }
         .hex-line-label {
             font-size: 0.65rem;
             color: var(--text-muted);
-            width: 36px;
+            width: 38px;
             text-align: right;
-            margin-right: 10px;
+            margin-right: 12px;
             flex-shrink: 0;
         }
 
@@ -340,8 +337,8 @@
             filter: grayscale(30%);
         }
         .btn-sm {
-            padding: 7px 14px;
-            font-size: 0.78rem;
+            padding: 8px 16px;
+            font-size: 0.8rem;
             border-radius: 20px;
         }
         .btn-group {
@@ -352,44 +349,15 @@
             margin-top: 14px;
         }
 
-        /* AI explanation area */
-        .explanation-box {
-            background: rgba(0, 0, 0, 0.25);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 16px 18px;
-            margin-top: 14px;
-            min-height: 60px;
-            font-size: 0.88rem;
-            line-height: 1.7;
-            letter-spacing: 0.03em;
+        /* Local info */
+        .local-info {
+            margin-top: 12px;
+            font-size: 0.82rem;
             color: var(--text-secondary);
-            transition: var(--transition);
-            white-space: pre-wrap;
-            word-break: break-word;
-            text-align: left;
-        }
-        .explanation-box.loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            color: var(--text-muted);
-            font-style: italic;
-        }
-        .spinner {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--border);
-            border-top-color: var(--gold);
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            text-align: center;
+            letter-spacing: 0.03em;
+            line-height: 1.6;
+            padding: 0 8px;
         }
 
         /* Settings panel */
@@ -418,7 +386,7 @@
             display: none;
             margin-top: 10px;
             padding: 16px;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.25);
             border-radius: var(--radius-sm);
             border: 1px solid var(--border);
         }
@@ -450,11 +418,105 @@
         .settings-panel select:focus {
             outline: none;
             border-color: var(--gold-dark);
-            box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.1);
+            box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.15);
         }
-        .settings-panel input::placeholder {
+
+        /* Modal (弹窗) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px 22px;
+            width: 90%;
+            max-width: 520px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+            position: relative;
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            right: 18px;
+            background: none;
+            border: none;
             color: var(--text-muted);
-            opacity: 0.6;
+            font-size: 1.4rem;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            line-height: 1;
+        }
+        .modal-close:hover {
+            background: rgba(201, 169, 110, 0.15);
+            color: var(--gold-light);
+        }
+        .modal-title {
+            font-size: 1.2rem;
+            color: var(--gold-light);
+            margin-bottom: 16px;
+            text-align: center;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+        }
+        .modal-body {
+            font-size: 0.92rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .modal-body.loading {
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 20px 0;
+        }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* Toast */
@@ -466,7 +528,7 @@
             background: #2a2a33;
             border: 1px solid var(--border);
             color: var(--text);
-            padding: 10px 20px;
+            padding: 10px 22px;
             border-radius: 25px;
             font-size: 0.85rem;
             letter-spacing: 0.04em;
@@ -487,25 +549,17 @@
                 font-size: 1.5rem;
             }
             .yao-symbol {
-                font-size: 1.4rem;
+                font-size: 1.5rem;
             }
             .hex-line .bar {
-                width: 70px;
+                width: 80px;
             }
             .hex-line.yin .bar-left,
             .hex-line.yin .bar-right {
-                width: 28px;
+                width: 30px;
             }
             .hex-line.yin .gap {
-                width: 14px;
-            }
-            .yao-label {
-                width: 36px;
-                font-size: 0.7rem;
-            }
-            .yao-indicator {
-                width: 28px;
-                font-size: 0.7rem;
+                width: 16px;
             }
             .card {
                 padding: 16px 12px;
@@ -515,7 +569,10 @@
                 font-size: 0.8rem;
             }
             .gua-name {
-                font-size: 1.3rem;
+                font-size: 1.4rem;
+            }
+            .modal-content {
+                padding: 20px 16px;
             }
         }
     </style>
@@ -532,57 +589,60 @@
         <!-- Yao Selector Card -->
         <div class="card" id="selectorCard">
             <div class="card-title">选择六爻（从下往上）</div>
-            <div class="yao-selector" id="yaoSelector">
-                <!-- 6 yao rows, from bottom (初爻) to top (上爻) -->
-            </div>
+            <div class="yao-selector" id="yaoSelector"></div>
             <div class="btn-group">
-                <button class="btn btn-sm" id="btnRandom" title="随机生成一卦">🎲 随机卦象</button>
-                <button class="btn btn-sm" id="btnClear" title="全部重置为阳爻">↺ 重置</button>
-                <button class="btn btn-sm" id="btnFlipAll" title="翻转全部爻位">⇄ 全部翻转</button>
+                <button class="btn btn-sm" id="btnRandom">🎲 随机卦象</button>
+                <button class="btn btn-sm" id="btnClear">↺ 重置</button>
+                <button class="btn btn-sm" id="btnFlipAll">⇄ 全部翻转</button>
             </div>
         </div>
 
         <!-- Result Card -->
         <div class="card" id="resultCard">
             <div class="card-title">卦象结果</div>
-            <div class="hexagram-visual" id="hexagramVisual">
-                <!-- Visual hexagram from bottom to top -->
-            </div>
+            <div class="hexagram-visual" id="hexagramVisual"></div>
             <div class="result-area">
                 <div class="gua-number" id="guaNumber"></div>
                 <div class="gua-name" id="guaName">—</div>
                 <div class="gua-tags" id="guaTags"></div>
             </div>
+            <div class="local-info" id="localInfo"></div>
             <div class="btn-group">
-                <button class="btn btn-primary" id="btnExplain" disabled>🔮 AI 解卦</button>
+                <button class="btn btn-primary" id="btnExplain" disabled>🔮 AI 解卦 (弹窗)</button>
             </div>
-            <div class="explanation-box" id="explanationBox">
-                <span style="color:var(--text-muted);">点击「AI 解卦」获取详细解释</span>
-            </div>
-            <!-- Local basic info fallback -->
-            <div id="localInfo" style="margin-top:10px;font-size:0.8rem;color:var(--text-muted);text-align:center;letter-spacing:0.03em;"></div>
         </div>
 
         <!-- Settings -->
         <div class="settings-toggle">
-            <button id="btnToggleSettings">⚙️ API 设置</button>
+            <button id="btnToggleSettings">⚙️ API 设置 (DeepSeek)</button>
         </div>
         <div class="settings-panel" id="settingsPanel">
             <label for="apiKey">API Key</label>
-            <input type="password" id="apiKey" placeholder="sk-... 或您的API密钥">
+            <input type="password" id="apiKey" placeholder="sk-...">
             <label for="apiBase">API Base URL</label>
-            <input type="text" id="apiBase" placeholder="https://api.openai.com/v1">
+            <input type="text" id="apiBase" value="https://api.deepseek.com">
             <label for="apiModel">模型名称</label>
-            <input type="text" id="apiModel" placeholder="gpt-4o-mini">
-            <label for="apiSystemPrompt">System Prompt（自定义AI指令）</label>
-            <input type="text" id="apiSystemPrompt" placeholder="默认：简短直接解释卦象，无需开场白">
+            <input type="text" id="apiModel" value="deepseek-chat">
+            <label for="apiSystemPrompt">System Prompt (自定义指令)</label>
+            <input type="text" id="apiSystemPrompt" value="你是一位精通周易六十四卦的专家。请直接对以下卦象进行简短精炼的解释，涵盖卦名含义、核心寓意、对问卦者的启示。直接输出解释内容，不需要任何开场白、问候语或确认语句。控制在200字以内。">
             <div class="btn-group" style="margin-top:12px;">
                 <button class="btn btn-sm" id="btnSaveSettings">💾 保存设置</button>
                 <button class="btn btn-sm" id="btnResetSettings">↺ 恢复默认</button>
             </div>
             <p style="font-size:0.7rem;color:var(--text-muted);margin-top:8px;text-align:center;">
-                ⚠️ API Key 仅存储在浏览器本地，不会上传到任何第三方服务器
+                ⚠️ API Key 仅存储在浏览器本地，不会上传到任何服务器
             </p>
+        </div>
+    </div>
+
+    <!-- AI解释弹窗 -->
+    <div class="modal-overlay" id="explainModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalCloseBtn">&times;</button>
+            <div class="modal-title">🔮 AI 卦象解读</div>
+            <div class="modal-body" id="modalBody">
+                <!-- 动态内容 -->
+            </div>
         </div>
     </div>
 
@@ -591,14 +651,11 @@
 
     <script>
         (function() {
-            // ============ 64卦完整数据库 ============
-            // 八卦：用0-7表示，三位二进制从下往上(初爻,二爻,三爻)
-            // 0=坤(000) 1=艮(001) 2=坎(010) 3=巽(011) 4=震(100) 5=离(101) 6=兑(110) 7=乾(111)
+            // ============ 64卦数据库 ============
             const BA_GUA_NAMES = ['坤', '艮', '坎', '巽', '震', '离', '兑', '乾'];
             const BA_GUA_SYMBOLS = ['☷', '☶', '☵', '☴', '☳', '☲', '☱', '☰'];
             const BA_GUA_ELEMENTS = ['地', '山', '水', '风', '雷', '火', '泽', '天'];
 
-            // 64卦数据库：key = "上卦数字-下卦数字"
             const GUA_DATABASE = {
                 '7-7': { name: '乾为天', order: 1, desc: '乾上乾下，纯阳之卦。元亨利贞，自强不息。象征天行健，君子以自强不息。' },
                 '0-0': { name: '坤为地', order: 2, desc: '坤上坤下，纯阴之卦。元亨，利牝马之贞。象征地势坤，君子以厚德载物。' },
@@ -610,7 +667,7 @@
                 '2-0': { name: '水地比', order: 8, desc: '坎上坤下，亲比之卦。地上有水，万物亲附。宜团结协作。' },
                 '3-7': { name: '风天小畜', order: 9, desc: '巽上乾下，小畜之卦。风行天上，小有积蓄。宜积小成大。' },
                 '7-6': { name: '天泽履', order: 10, desc: '乾上兑下，履践之卦。上天下泽，循礼而行。宜谨慎行事。' },
-                '0-7': { name: '地天泰', order: 11, desc: '坤上乾下，通泰之卦。天地交而万物通，上下交而其志同。大吉。' },
+                '0-7': { name: '地天泰', order: 11, desc: '坤上乾下，通泰之卦。天地交而万物通。大吉之象。' },
                 '7-0': { name: '天地否', order: 12, desc: '乾上坤下，否塞之卦。天地不交，万物不通。宜退守自保。' },
                 '7-5': { name: '天火同人', order: 13, desc: '乾上离下，同人之卦。天与火同，类族辨物。宜广结善缘。' },
                 '5-7': { name: '火天大有', order: 14, desc: '离上乾下，大有之卦。火在天上，无所不照。丰收大有之年。' },
@@ -667,9 +724,7 @@
             };
 
             // ============ 状态 ============
-            // yaoValues: 6个爻位，索引0=初爻(最下), 索引5=上爻(最上)
-            // true=阳爻(—), false=阴爻(- -)
-            let yaoValues = [true, true, true, true, true, true]; // 默认全阳(乾为天)
+            let yaoValues = [true, true, true, true, true, true]; // 全阳
             let currentGuaKey = null;
             let isExplaining = false;
 
@@ -679,7 +734,6 @@
             const guaName = document.getElementById('guaName');
             const guaNumber = document.getElementById('guaNumber');
             const guaTags = document.getElementById('guaTags');
-            const explanationBox = document.getElementById('explanationBox');
             const localInfo = document.getElementById('localInfo');
             const btnExplain = document.getElementById('btnExplain');
             const btnRandom = document.getElementById('btnRandom');
@@ -690,13 +744,16 @@
             const btnSaveSettings = document.getElementById('btnSaveSettings');
             const btnResetSettings = document.getElementById('btnResetSettings');
             const toast = document.getElementById('toast');
+            const explainModal = document.getElementById('explainModal');
+            const modalBody = document.getElementById('modalBody');
+            const modalCloseBtn = document.getElementById('modalCloseBtn');
 
-            // ============ 设置管理 ============
+            // ============ 设置管理 (默认DeepSeek) ============
             const DEFAULT_SETTINGS = {
                 apiKey: '',
-                apiBase: 'https://api.openai.com/v1',
-                apiModel: 'gpt-4o-mini',
-                apiSystemPrompt: '你是一位精通周易六十四卦的专家。请直接对以下卦象进行简短精炼的解释，涵盖卦名含义、核心寓意、对问卦者的启示。直接输出解释内容，不需要任何开场白、问候语或确认语句。控制在200字以内。结合网络搜索结果进行补充说明（如有）。',
+                apiBase: 'https://api.deepseek.com',
+                apiModel: 'deepseek-chat',
+                apiSystemPrompt: '你是一位精通周易六十四卦的专家。请直接对以下卦象进行简短精炼的解释，涵盖卦名含义、核心寓意、对问卦者的启示。直接输出解释内容，不需要任何开场白、问候语或确认语句。控制在200字以内。',
             };
 
             function loadSettings() {
@@ -705,22 +762,21 @@
                     if (saved) {
                         return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
                     }
-                } catch (e) { /* ignore */ }
+                } catch (e) {}
                 return { ...DEFAULT_SETTINGS };
             }
 
             function saveSettings(settings) {
                 try {
                     localStorage.setItem('liuyao_settings', JSON.stringify(settings));
-                } catch (e) { /* ignore */ }
+                } catch (e) {}
             }
 
             function populateSettingsForm(settings) {
                 document.getElementById('apiKey').value = settings.apiKey || '';
-                document.getElementById('apiBase').value = settings.apiBase || DEFAULT_SETTINGS.apiBase;
-                document.getElementById('apiModel').value = settings.apiModel || DEFAULT_SETTINGS.apiModel;
-                document.getElementById('apiSystemPrompt').value = settings.apiSystemPrompt || DEFAULT_SETTINGS
-                    .apiSystemPrompt;
+                document.getElementById('apiBase').value = settings.apiBase;
+                document.getElementById('apiModel').value = settings.apiModel;
+                document.getElementById('apiSystemPrompt').value = settings.apiSystemPrompt;
             }
 
             let currentSettings = loadSettings();
@@ -728,32 +784,55 @@
 
             // ============ Toast ============
             let toastTimer;
-
             function showToast(msg) {
                 clearTimeout(toastTimer);
                 toast.textContent = msg;
                 toast.classList.add('show');
-                toastTimer = setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 2200);
+                toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
             }
 
-            // ============ 计算卦象 ============
+            // ============ 弹窗控制 ============
+            function openModal(content, isLoading = false) {
+                modalBody.innerHTML = content;
+                if (isLoading) {
+                    modalBody.classList.add('loading');
+                } else {
+                    modalBody.classList.remove('loading');
+                }
+                explainModal.classList.add('active');
+            }
+
+            function closeModal() {
+                explainModal.classList.remove('active');
+                // 延迟清除内容避免关闭动画时看到空白
+                setTimeout(() => {
+                    if (!explainModal.classList.contains('active')) {
+                        modalBody.innerHTML = '';
+                    }
+                }, 300);
+            }
+
+            modalCloseBtn.addEventListener('click', closeModal);
+            explainModal.addEventListener('click', (e) => {
+                if (e.target === explainModal) closeModal();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && explainModal.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+
+            // ============ 卦象计算 ============
             function getTrigramValue(startIndex) {
-                // startIndex: 0=下卦(初爻,二爻,三爻), 3=上卦(四爻,五爻,上爻)
                 let val = 0;
                 for (let i = 0; i < 3; i++) {
-                    if (yaoValues[startIndex + i]) {
-                        val += (1 << i); // 从下往上，低位=初爻
-                    }
+                    if (yaoValues[startIndex + i]) val += (1 << i);
                 }
-                return val; // 0-7
+                return val;
             }
 
             function getGuaKey() {
-                const upperVal = getTrigramValue(3); // 上卦(四爻,五爻,上爻)
-                const lowerVal = getTrigramValue(0); // 下卦(初爻,二爻,三爻)
-                return `${upperVal}-${lowerVal}`;
+                return `${getTrigramValue(3)}-${getTrigramValue(0)}`;
             }
 
             function getGuaInfo() {
@@ -781,21 +860,13 @@
 
             function renderYaoSelector() {
                 yaoSelector.innerHTML = '';
-                // 从下往上显示：初爻(index 0)在最下面，上爻(index 5)在最上面
-                // UI中从上往下排列：上爻在最上面，初爻在最下面
                 for (let i = 5; i >= 0; i--) {
                     const isYang = yaoValues[i];
-                    const positionName = YAO_POSITION_NAMES[i];
-                    const yaoName = isYang ? `九${positionName}` : `六${positionName}`;
-                    // 对于初爻和上爻，称谓略有不同
-                    let displayYaoName;
-                    if (i === 0) {
-                        displayYaoName = isYang ? '初九' : '初六';
-                    } else if (i === 5) {
-                        displayYaoName = isYang ? '上九' : '上六';
-                    } else {
-                        displayYaoName = yaoName;
-                    }
+                    const pos = YAO_POSITION_NAMES[i];
+                    let displayName;
+                    if (i === 0) displayName = isYang ? '初九' : '初六';
+                    else if (i === 5) displayName = isYang ? '上九' : '上六';
+                    else displayName = isYang ? `九${pos}` : `六${pos}`;
 
                     const row = document.createElement('div');
                     row.className = 'yao-row';
@@ -805,18 +876,15 @@
                         <div class="yao-display">
                             <span class="yao-symbol ${isYang ? 'yang' : 'yin'}">${isYang ? '━━━━━' : '━ ━ ━'}</span>
                         </div>
-                        <span class="yao-indicator ${isYang ? 'active-yang' : 'active-yin'}">${displayYaoName}</span>
+                        <span class="yao-indicator ${isYang ? 'active-yang' : 'active-yin'}">${displayName}</span>
                     `;
                     row.addEventListener('click', () => {
                         yaoValues[i] = !yaoValues[i];
                         updateAll();
-                        // 添加微小的触觉反馈模拟
                         row.style.transform = 'scale(0.94)';
-                        setTimeout(() => { row.style.transform = ''; }, 120);
+                        setTimeout(() => row.style.transform = '', 120);
                     });
                     yaoSelector.appendChild(row);
-
-                    // 在爻之间添加分隔线（除了最后一个即最上面的上爻之后）
                     if (i > 0) {
                         const divider = document.createElement('hr');
                         divider.className = 'yao-divider';
@@ -827,8 +895,6 @@
 
             function renderHexagramVisual() {
                 hexagramVisual.innerHTML = '';
-                // 从下往上显示：初爻(index 0)在下，上爻(index 5)在上
-                // UI中从上往下排列
                 for (let i = 5; i >= 0; i--) {
                     const isYang = yaoValues[i];
                     const lineDiv = document.createElement('div');
@@ -836,8 +902,7 @@
                     if (isYang) {
                         lineDiv.innerHTML = `<span class="hex-line-label">${YAO_LABELS[i]}</span><div class="bar"></div>`;
                     } else {
-                        lineDiv.innerHTML =
-                            `<span class="hex-line-label">${YAO_LABELS[i]}</span><div class="bar-left"></div><div class="gap"></div><div class="bar-right"></div>`;
+                        lineDiv.innerHTML = `<span class="hex-line-label">${YAO_LABELS[i]}</span><div class="bar-left"></div><div class="gap"></div><div class="bar-right"></div>`;
                     }
                     hexagramVisual.appendChild(lineDiv);
                 }
@@ -846,30 +911,25 @@
             function renderResult() {
                 const guaData = getGuaInfo();
                 currentGuaKey = guaData.key;
-
                 if (guaData.info) {
                     guaName.textContent = guaData.info.name;
                     guaNumber.textContent = `周易第${guaData.info.order}卦`;
                     guaTags.innerHTML = `
-                        <span class="gua-tag">上卦：${guaData.upperSymbol} ${guaData.upperName}(${guaData.upperElement})</span>
-                        <span class="gua-tag">下卦：${guaData.lowerSymbol} ${guaData.lowerName}(${guaData.lowerElement})</span>
+                        <span class="gua-tag">上：${guaData.upperSymbol} ${guaData.upperName}(${guaData.upperElement})</span>
+                        <span class="gua-tag">下：${guaData.lowerSymbol} ${guaData.lowerName}(${guaData.lowerElement})</span>
                     `;
                     localInfo.textContent = guaData.info.desc;
                     btnExplain.disabled = false;
                 } else {
-                    // 理论上不会出现，因为覆盖了64卦
                     guaName.textContent = '未知卦象';
                     guaNumber.textContent = '';
                     guaTags.innerHTML = `
-                        <span class="gua-tag">上卦：${guaData.upperSymbol} ${guaData.upperName}</span>
-                        <span class="gua-tag">下卦：${guaData.lowerSymbol} ${guaData.lowerName}</span>
+                        <span class="gua-tag">上：${guaData.upperSymbol} ${guaData.upperName}</span>
+                        <span class="gua-tag">下：${guaData.lowerSymbol} ${guaData.lowerName}</span>
                     `;
-                    localInfo.textContent = '（数据库未匹配到此卦象，请检查爻位设置）';
+                    localInfo.textContent = '（数据库未匹配，请检查爻位）';
                     btnExplain.disabled = true;
                 }
-                // 清除之前的AI解释
-                explanationBox.innerHTML =
-                    '<span style="color:var(--text-muted);">点击「AI 解卦」获取详细解释</span>';
             }
 
             function updateAll() {
@@ -878,7 +938,7 @@
                 renderResult();
             }
 
-            // ============ AI 解释 ============
+            // ============ AI 解卦（弹窗显示） ============
             async function fetchAIExplanation() {
                 if (isExplaining) return;
                 const guaData = getGuaInfo();
@@ -886,11 +946,9 @@
                     showToast('请先选择有效的卦象');
                     return;
                 }
-
                 const settings = loadSettings();
                 if (!settings.apiKey || settings.apiKey.trim() === '') {
-                    showToast('请先在API设置中填入API Key');
-                    // 自动展开设置面板
+                    showToast('请先在API设置中填入DeepSeek API Key');
                     settingsPanel.classList.add('open');
                     document.getElementById('apiKey').focus();
                     return;
@@ -899,8 +957,9 @@
                 isExplaining = true;
                 btnExplain.disabled = true;
                 btnExplain.textContent = '⏳ 解读中...';
-                explanationBox.classList.add('loading');
-                explanationBox.innerHTML = '<span class="spinner"></span> AI正在解读卦象...';
+
+                // 打开弹窗并显示加载状态
+                openModal('<span class="spinner"></span> AI 正在解读卦象，请稍候...', true);
 
                 const guaInfo = guaData.info;
                 const userPrompt = `请解读以下卦象：
@@ -931,34 +990,28 @@
                                 { role: 'system', content: systemPrompt },
                                 { role: 'user', content: userPrompt },
                             ],
-                            max_tokens: 400,
+                            max_tokens: 500,
                             temperature: 0.6,
                         }),
                     });
 
                     if (!response.ok) {
                         const errorData = await response.json().catch(() => ({}));
-                        throw new Error(
-                            errorData.error?.message || `API请求失败 (HTTP ${response.status})`
-                        );
+                        throw new Error(errorData.error?.message || `API请求失败 (HTTP ${response.status})`);
                     }
 
                     const data = await response.json();
                     const aiText = data.choices?.[0]?.message?.content || '（AI未返回有效内容）';
-
-                    explanationBox.classList.remove('loading');
-                    explanationBox.textContent = aiText;
+                    openModal(aiText, false);
                     showToast('✅ AI解读完成');
                 } catch (error) {
-                    explanationBox.classList.remove('loading');
-                    explanationBox.innerHTML =
-                        `<span style="color:#c0392b;">❌ 解读失败：${escapeHTML(error.message)}</span>
-                        <br><span style="font-size:0.75rem;color:var(--text-muted);">请检查API设置是否正确（Key、Base URL、模型名称）</span>`;
-                    showToast('❌ AI解读失败，请检查API设置');
+                    openModal(`<span style="color:#c0392b;">❌ 解读失败：${escapeHTML(error.message)}</span>
+                        <br><span style="font-size:0.8rem;color:var(--text-muted);">请检查API设置（Key、Base URL、模型名称）</span>`, false);
+                    showToast('❌ AI解读失败，请检查设置');
                 } finally {
                     isExplaining = false;
                     btnExplain.disabled = false;
-                    btnExplain.textContent = '🔮 AI 解卦';
+                    btnExplain.textContent = '🔮 AI 解卦 (弹窗)';
                 }
             }
 
@@ -970,51 +1023,39 @@
 
             // ============ 按钮事件 ============
             btnExplain.addEventListener('click', fetchAIExplanation);
-
             btnRandom.addEventListener('click', () => {
-                for (let i = 0; i < 6; i++) {
-                    yaoValues[i] = Math.random() > 0.5;
-                }
+                for (let i = 0; i < 6; i++) yaoValues[i] = Math.random() > 0.5;
                 updateAll();
                 showToast('🎲 已随机生成卦象');
             });
-
             btnClear.addEventListener('click', () => {
                 yaoValues = [true, true, true, true, true, true];
                 updateAll();
                 showToast('↺ 已重置为乾为天');
             });
-
             btnFlipAll.addEventListener('click', () => {
-                for (let i = 0; i < 6; i++) {
-                    yaoValues[i] = !yaoValues[i];
-                }
+                for (let i = 0; i < 6; i++) yaoValues[i] = !yaoValues[i];
                 updateAll();
                 showToast('⇄ 已全部翻转');
             });
-
             btnToggleSettings.addEventListener('click', () => {
                 settingsPanel.classList.toggle('open');
                 if (settingsPanel.classList.contains('open')) {
-                    const s = loadSettings();
-                    populateSettingsForm(s);
+                    populateSettingsForm(loadSettings());
                 }
             });
-
             btnSaveSettings.addEventListener('click', () => {
                 const newSettings = {
                     apiKey: document.getElementById('apiKey').value.trim(),
                     apiBase: document.getElementById('apiBase').value.trim() || DEFAULT_SETTINGS.apiBase,
                     apiModel: document.getElementById('apiModel').value.trim() || DEFAULT_SETTINGS.apiModel,
-                    apiSystemPrompt: document.getElementById('apiSystemPrompt').value.trim() || DEFAULT_SETTINGS
-                        .apiSystemPrompt,
+                    apiSystemPrompt: document.getElementById('apiSystemPrompt').value.trim() || DEFAULT_SETTINGS.apiSystemPrompt,
                 };
                 saveSettings(newSettings);
                 currentSettings = newSettings;
                 showToast('💾 设置已保存');
                 settingsPanel.classList.remove('open');
             });
-
             btnResetSettings.addEventListener('click', () => {
                 saveSettings(DEFAULT_SETTINGS);
                 currentSettings = { ...DEFAULT_SETTINGS };
@@ -1024,42 +1065,29 @@
 
             // ============ 键盘快捷键 ============
             document.addEventListener('keydown', (e) => {
-                // 数字键1-6切换对应爻位（1=初爻, 6=上爻）
-                if (e.key >= '1' && e.key <= '6' && !e.target.closest('input') && !e.target.closest(
-                        'textarea') && !e.target.closest('select')) {
-                    const index = parseInt(e.key) - 1; // 0-5，0=初爻
+                if (e.key >= '1' && e.key <= '6' && !e.target.closest('input, textarea, select')) {
+                    const index = parseInt(e.key) - 1;
                     yaoValues[index] = !yaoValues[index];
                     updateAll();
-                    // 高亮对应行
                     const row = yaoSelector.querySelector(`[data-index="${index}"]`);
                     if (row) {
                         row.style.background = 'rgba(201,169,110,0.15)';
-                        setTimeout(() => { row.style.background = ''; }, 200);
+                        setTimeout(() => row.style.background = '', 200);
                     }
                 }
-                // R键随机
-                if (e.key === 'r' && !e.target.closest('input') && !e.target.closest('textarea') && !e.target
-                    .closest('select')) {
+                if (e.key === 'r' && !e.target.closest('input, textarea, select')) {
                     btnRandom.click();
                 }
-                // Enter键触发AI解卦
-                if (e.key === 'Enter' && !e.target.closest('input') && !e.target.closest('textarea') && !e.target
-                    .closest('select') && !btnExplain.disabled && !isExplaining) {
+                if (e.key === 'Enter' && !e.target.closest('input, textarea, select') && !btnExplain.disabled && !isExplaining) {
                     e.preventDefault();
                     btnExplain.click();
                 }
             });
 
             // ============ 初始化 ============
-            function init() {
-                updateAll();
-                // 初始显示乾为天
-                console.log('☯ 六爻占卜网站已就绪');
-                console.log('  快捷键：数字1-6切换爻位 | R随机 | Enter解卦');
-                console.log('  当前卦象：' + (getGuaInfo().info?.name || '未知'));
-            }
-
-            init();
+            updateAll();
+            console.log('☯ 六爻占卜已就绪 (DeepSeek)');
+            console.log('  快捷键：数字1-6切换爻位 | R随机 | Enter解卦');
         })();
     </script>
 </body>
