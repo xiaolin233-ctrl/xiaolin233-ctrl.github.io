@@ -14,186 +14,54 @@
             --yang: #e8d5a3;
             --yin: #a0b0c0;
         }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: var(--bg);
             color: var(--text);
             font-family: 'Noto Serif SC', 'STSong', 'KaiTi', serif;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
+            display: flex; justify-content: center; padding: 20px;
         }
-        .container {
-            max-width: 500px;
-            width: 100%;
-        }
-        .header {
-            text-align: center;
-            padding: 20px 0;
-            font-size: 1.8rem;
-            color: var(--gold);
-        }
-        .card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
-        }
-        .yao-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px;
-            cursor: pointer;
-            border-radius: 8px;
-            user-select: none;
-            transition: 0.2s;
-        }
-        .yao-row:hover {
-            background: rgba(201, 169, 110, 0.08);
-        }
-        .yao-label {
-            width: 40px;
-            font-size: 0.8rem;
-            color: #7a7265;
-        }
-        .yao-symbol {
-            flex: 1;
-            font-size: 1.6rem;
-            text-align: center;
-            font-weight: bold;
-        }
-        .yao-symbol.yang {
-            color: var(--yang);
-        }
-        .yao-symbol.yin {
-            color: var(--yin);
-        }
-        .gua-name {
-            text-align: center;
-            font-size: 1.6rem;
-            color: #e0c88e;
-            margin: 12px 0;
-            font-weight: bold;
-        }
+        .container { max-width: 500px; width: 100%; }
+        .header { text-align: center; padding: 20px 0; font-size: 1.8rem; color: var(--gold); }
+        .card { background: var(--card); border-radius: 12px; padding: 18px; margin-bottom: 16px; border: 1px solid var(--border); }
+        .yao-row { display: flex; align-items: center; gap: 12px; padding: 8px; cursor: pointer; border-radius: 8px; user-select: none; transition: 0.2s; }
+        .yao-row:hover { background: rgba(201,169,110,0.08); }
+        .yao-label { width: 40px; font-size: 0.8rem; color: #7a7265; }
+        .yao-symbol { flex:1; font-size: 1.6rem; text-align: center; font-weight: bold; }
+        .yao-symbol.yang { color: var(--yang); }
+        .yao-symbol.yin { color: var(--yin); }
+        .gua-name { text-align: center; font-size: 1.6rem; color: #e0c88e; margin: 12px 0; font-weight: bold; }
         .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 18px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            background: var(--card);
-            color: var(--text);
-            font-family: inherit;
-            cursor: pointer;
-            transition: 0.2s;
+            display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px;
+            border-radius: 20px; border: 1px solid var(--border); background: var(--card);
+            color: var(--text); font-family: inherit; cursor: pointer; transition: 0.2s;
         }
-        .btn:hover {
-            border-color: #9a7b3e;
-        }
-        .btn-primary {
-            background: #b8943e;
-            color: #1a1a1f;
-            border: none;
-            font-weight: bold;
-        }
-        .btn-primary:disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
+        .btn:hover { border-color: #9a7b3e; }
+        .btn-primary { background: #b8943e; color: #1a1a1f; border: none; font-weight: bold; }
+        .btn-primary:disabled { opacity: 0.5; pointer-events: none; }
         .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-content {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            max-width: 400px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
+            background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+            padding: 20px; max-width: 400px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative;
         }
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 14px;
-            background: none;
-            border: none;
-            color: #7a7265;
-            font-size: 1.4rem;
-            cursor: pointer;
-        }
-        .domain-btn {
-            margin: 4px;
-            padding: 6px 16px;
-            border-radius: 16px;
-            font-size: 0.8rem;
-        }
-        .domain-btn.active {
-            background: rgba(201, 169, 110, 0.3);
-            border-color: var(--gold);
-            color: #e0c88e;
-        }
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #2a2a33;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            opacity: 0;
-            transition: 0.3s;
-        }
-        .toast.show {
-            opacity: 1;
-        }
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #3a3530;
-            border-top-color: var(--gold);
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
+        .modal-close { position: absolute; top:10px; right:14px; background: none; border: none; color: #7a7265; font-size: 1.4rem; cursor: pointer; }
+        .domain-btn { margin: 4px; padding: 6px 16px; border-radius: 16px; font-size: 0.8rem; }
+        .domain-btn.active { background: rgba(201,169,110,0.3); border-color: var(--gold); color: #e0c88e; }
+        .toast { position: fixed; top:20px; left:50%; transform: translateX(-50%); background: #2a2a33; padding: 8px 20px; border-radius: 20px; font-size: 0.8rem; opacity:0; transition:0.3s; }
+        .toast.show { opacity: 1; }
+        .spinner { display: inline-block; width:16px; height:16px; border:2px solid #3a3530; border-top-color: var(--gold); border-radius:50%; animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">☯ 六爻占卜</div>
-
         <div class="card">
             <div id="yaoSelector" style="display:flex;flex-direction:column;align-items:center;"></div>
             <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;">
@@ -202,19 +70,17 @@
                 <button class="btn btn-sm" id="btnFlipAll">⇄翻转</button>
             </div>
         </div>
-
         <div class="card" style="text-align:center;">
             <div id="guaName" class="gua-name">—</div>
             <div id="guaTags" style="margin:8px 0;font-size:0.8rem;color:#b0a89a;"></div>
             <button class="btn btn-primary" id="btnExplain" disabled>🔮 AI 解卦</button>
         </div>
-
         <div style="text-align:center;margin-bottom:10px;">
             <button class="btn btn-sm" id="btnSettings">⚙️ API设置</button>
         </div>
         <div id="settingsPanel" style="display:none;background:#2a2a33;padding:14px;border-radius:10px;margin-bottom:16px;">
             <input type="password" id="apiKey" placeholder="DeepSeek API Key" style="width:100%;margin:4px 0;padding:6px;background:#1a1a1f;border:1px solid #3a3530;color:#e8e0d5;border-radius:6px;">
-            <input type="text" id="apiModel" value="deepseek-v4-pro" style="width:100%;margin:4px 0;padding:6px;background:#1a1a1f;border:1px solid #3a3530;color:#e8e0d5;border-radius:6px;">
+            <input type="text" id="apiModel" value="deepseek-chat" placeholder="模型名称" style="width:100%;margin:4px 0;padding:6px;background:#1a1a1f;border:1px solid #3a3530;color:#e8e0d5;border-radius:6px;">
             <button class="btn btn-sm" id="btnSave" style="margin-top:8px;">保存设置</button>
         </div>
     </div>
@@ -229,206 +95,207 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // 完整的六十四卦数据库
+        // 完整六十四卦数据库
         const GUA_DB = {
-            '7-7': { n: '乾为天', o: 1, d: '元亨利贞。天行健，君子以自强不息。' },
-            '0-0': { n: '坤为地', o: 2, d: '元亨，利牝马之贞。地势坤，君子以厚德载物。' },
-            '2-4': { n: '水雷屯', o: 3, d: '万物始生，艰难重重。宜守正待时。' },
-            '1-2': { n: '山水蒙', o: 4, d: '蒙昧启智，山下有险。需耐心引导。' },
-            '2-7': { n: '水天需', o: 5, d: '云上于天，待时而雨。宜静候时机。' },
-            '7-2': { n: '天水讼', o: 6, d: '天与水违行，争讼难解。宜和解。' },
-            '0-2': { n: '地水师', o: 7, d: '地中有水，聚众用兵。宜师出有名。' },
-            '2-0': { n: '水地比', o: 8, d: '地上有水，万物亲附。宜团结协作。' },
-            '3-7': { n: '风天小畜', o: 9, d: '风行天上，小有积蓄。宜积小成大。' },
-            '7-6': { n: '天泽履', o: 10, d: '上天下泽，循礼而行。宜谨慎行事。' },
-            '0-7': { n: '地天泰', o: 11, d: '天地交泰，万物通亨。大吉之象。' },
-            '7-0': { n: '天地否', o: 12, d: '天地不交，万物不通。宜退守自保。' },
-            '7-5': { n: '天火同人', o: 13, d: '天与火同，类族辨物。宜广结善缘。' },
-            '5-7': { n: '火天大有', o: 14, d: '火在天上，无所不照。丰收大有之年。' },
-            '0-1': { n: '地山谦', o: 15, d: '地中有山，卑以自牧。谦受益，满招损。' },
-            '4-0': { n: '雷地豫', o: 16, d: '雷出地奋，和乐愉悦。宜顺势而动。' },
-            '6-4': { n: '泽雷随', o: 17, d: '泽中有雷，随时而动。宜顺应时势。' },
-            '1-3': { n: '山风蛊', o: 18, d: '山下有风，物腐虫生。宜整治弊病。' },
-            '0-6': { n: '地泽临', o: 19, d: '地临泽上，君临天下。宜亲民治事。' },
-            '3-0': { n: '风地观', o: 20, d: '风行地上，周观四方。宜审时度势。' },
-            '5-4': { n: '火雷噬嗑', o: 21, d: '雷电交加，刑狱断案。宜明断是非。' },
-            '1-5': { n: '山火贲', o: 22, d: '山下有火，文饰之美。宜注重内涵。' },
-            '1-0': { n: '山地剥', o: 23, d: '山附于地，剥蚀衰落。宜守正待时。' },
-            '0-4': { n: '地雷复', o: 24, d: '雷在地中，一阳来复。宜回归正道。' },
-            '7-4': { n: '天雷无妄', o: 25, d: '天下雷行，真实无妄。宜诚实守正。' },
-            '1-7': { n: '山天大畜', o: 26, d: '天在山中，厚积薄发。宜蓄养待发。' },
-            '1-4': { n: '山雷颐', o: 27, d: '山下有雷，养正之道。宜自食其力。' },
-            '6-3': { n: '泽风大过', o: 28, d: '泽灭木，过犹不及。宜调整平衡。' },
-            '2-2': { n: '坎为水', o: 29, d: '水流不息，习坎行险。宜诚信守中。' },
-            '5-5': { n: '离为火', o: 30, d: '日月丽天，光明继照。宜依附中正。' },
-            '6-1': { n: '泽山咸', o: 31, d: '山上有泽，男女感应。宜以诚相待。' },
-            '4-3': { n: '雷风恒', o: 32, d: '雷风相与，恒久不变。宜持之以恒。' },
-            '7-1': { n: '天山遁', o: 33, d: '天下有山，君子退隐。宜适时退避。' },
-            '4-7': { n: '雷天大壮', o: 34, d: '雷在天上，声势壮大。宜守正防过。' },
-            '5-0': { n: '火地晋', o: 35, d: '明出地上，光明上进。宜稳步前进。' },
-            '0-5': { n: '地火明夷', o: 36, d: '明入地中，光明受伤。宜韬光养晦。' },
-            '3-5': { n: '风火家人', o: 37, d: '风自火出，家道兴旺。宜和睦治家。' },
-            '5-6': { n: '火泽睽', o: 38, d: '上火下泽，二女同居。宜求同存异。' },
-            '2-1': { n: '水山蹇', o: 39, d: '山上有水，险阻难行。宜反求诸己。' },
-            '4-2': { n: '雷水解', o: 40, d: '雷雨作，百果草木皆甲坼。宜宽恕化解。' },
-            '1-6': { n: '山泽损', o: 41, d: '山下有泽，损下益上。宜节制减损。' },
-            '3-4': { n: '风雷益', o: 42, d: '风雷相益，损上益下。宜增益善行。' },
-            '6-7': { n: '泽天夬', o: 43, d: '泽上于天，决而和。宜果敢决断。' },
-            '7-3': { n: '天风姤', o: 44, d: '天下有风，不期而遇。宜谨慎应对。' },
-            '6-0': { n: '泽地萃', o: 45, d: '泽上于地，万物萃聚。宜聚集人才。' },
-            '0-3': { n: '地风升', o: 46, d: '地中生木，步步高升。宜循序渐进。' },
-            '6-2': { n: '泽水困', o: 47, d: '泽无水，困穷之象。宜坚守正道。' },
-            '2-3': { n: '水风井', o: 48, d: '木上有水，井养不穷。宜修德养民。' },
-            '6-5': { n: '泽火革', o: 49, d: '泽中有火，变革之象。宜顺天应人。' },
-            '5-3': { n: '火风鼎', o: 50, d: '木上有火，鼎烹之象。宜除旧布新。' },
-            '4-4': { n: '震为雷', o: 51, d: '洊雷震，君子以恐惧修省。宜戒惧谨慎。' },
-            '1-1': { n: '艮为山', o: 52, d: '兼山艮，思不出其位。宜知止守分。' },
-            '3-1': { n: '风山渐', o: 53, d: '山上有木，渐长渐进。宜循序渐进。' },
-            '4-6': { n: '雷泽归妹', o: 54, d: '泽上有雷，少女归嫁。宜慎重婚配。' },
-            '4-5': { n: '雷火丰', o: 55, d: '雷电皆至，丰盛之象。宜居安思危。' },
-            '5-1': { n: '火山旅', o: 56, d: '山上有火，旅居在外。宜谨慎行事。' },
-            '3-3': { n: '巽为风', o: 57, d: '随风巽，申命行事。宜顺从天命。' },
-            '6-6': { n: '兑为泽', o: 58, d: '丽泽兑，朋友讲习。宜和悦相处。' },
-            '3-2': { n: '风水涣', o: 59, d: '风行水上，涣散分离。宜凝聚人心。' },
-            '2-6': { n: '水泽节', o: 60, d: '泽上有水，节度有制。宜适可而止。' },
-            '3-6': { n: '风泽中孚', o: 61, d: '泽上有风，诚信感化。宜以诚待人。' },
-            '4-1': { n: '雷山小过', o: 62, d: '山上有雷，小有过越。宜纠偏守中。' },
-            '2-5': { n: '水火既济', o: 63, d: '水在火上，事已成就。宜居安思危。' },
-            '5-2': { n: '火水未济', o: 64, d: '火在水上，事未完成。宜继续努力。' }
+            '7-7':{n:'乾为天',o:1,d:'元亨利贞。天行健，君子以自强不息。'},
+            '0-0':{n:'坤为地',o:2,d:'元亨，利牝马之贞。地势坤，君子以厚德载物。'},
+            '2-4':{n:'水雷屯',o:3,d:'万物始生，艰难重重。宜守正待时。'},
+            '1-2':{n:'山水蒙',o:4,d:'蒙昧启智，山下有险。需耐心引导。'},
+            '2-7':{n:'水天需',o:5,d:'云上于天，待时而雨。宜静候时机。'},
+            '7-2':{n:'天水讼',o:6,d:'天与水违行，争讼难解。宜和解。'},
+            '0-2':{n:'地水师',o:7,d:'地中有水，聚众用兵。宜师出有名。'},
+            '2-0':{n:'水地比',o:8,d:'地上有水，万物亲附。宜团结协作。'},
+            '3-7':{n:'风天小畜',o:9,d:'风行天上，小有积蓄。宜积小成大。'},
+            '7-6':{n:'天泽履',o:10,d:'上天下泽，循礼而行。宜谨慎行事。'},
+            '0-7':{n:'地天泰',o:11,d:'天地交泰，万物通亨。大吉之象。'},
+            '7-0':{n:'天地否',o:12,d:'天地不交，万物不通。宜退守自保。'},
+            '7-5':{n:'天火同人',o:13,d:'天与火同，类族辨物。宜广结善缘。'},
+            '5-7':{n:'火天大有',o:14,d:'火在天上，无所不照。丰收大有之年。'},
+            '0-1':{n:'地山谦',o:15,d:'地中有山，卑以自牧。谦受益，满招损。'},
+            '4-0':{n:'雷地豫',o:16,d:'雷出地奋，和乐愉悦。宜顺势而动。'},
+            '6-4':{n:'泽雷随',o:17,d:'泽中有雷，随时而动。宜顺应时势。'},
+            '1-3':{n:'山风蛊',o:18,d:'山下有风，物腐虫生。宜整治弊病。'},
+            '0-6':{n:'地泽临',o:19,d:'地临泽上，君临天下。宜亲民治事。'},
+            '3-0':{n:'风地观',o:20,d:'风行地上，周观四方。宜审时度势。'},
+            '5-4':{n:'火雷噬嗑',o:21,d:'雷电交加，刑狱断案。宜明断是非。'},
+            '1-5':{n:'山火贲',o:22,d:'山下有火，文饰之美。宜注重内涵。'},
+            '1-0':{n:'山地剥',o:23,d:'山附于地，剥蚀衰落。宜守正待时。'},
+            '0-4':{n:'地雷复',o:24,d:'雷在地中，一阳来复。宜回归正道。'},
+            '7-4':{n:'天雷无妄',o:25,d:'天下雷行，真实无妄。宜诚实守正。'},
+            '1-7':{n:'山天大畜',o:26,d:'天在山中，厚积薄发。宜蓄养待发。'},
+            '1-4':{n:'山雷颐',o:27,d:'山下有雷，养正之道。宜自食其力。'},
+            '6-3':{n:'泽风大过',o:28,d:'泽灭木，过犹不及。宜调整平衡。'},
+            '2-2':{n:'坎为水',o:29,d:'水流不息，习坎行险。宜诚信守中。'},
+            '5-5':{n:'离为火',o:30,d:'日月丽天，光明继照。宜依附中正。'},
+            '6-1':{n:'泽山咸',o:31,d:'山上有泽，男女感应。宜以诚相待。'},
+            '4-3':{n:'雷风恒',o:32,d:'雷风相与，恒久不变。宜持之以恒。'},
+            '7-1':{n:'天山遁',o:33,d:'天下有山，君子退隐。宜适时退避。'},
+            '4-7':{n:'雷天大壮',o:34,d:'雷在天上，声势壮大。宜守正防过。'},
+            '5-0':{n:'火地晋',o:35,d:'明出地上，光明上进。宜稳步前进。'},
+            '0-5':{n:'地火明夷',o:36,d:'明入地中，光明受伤。宜韬光养晦。'},
+            '3-5':{n:'风火家人',o:37,d:'风自火出，家道兴旺。宜和睦治家。'},
+            '5-6':{n:'火泽睽',o:38,d:'上火下泽，二女同居。宜求同存异。'},
+            '2-1':{n:'水山蹇',o:39,d:'山上有水，险阻难行。宜反求诸己。'},
+            '4-2':{n:'雷水解',o:40,d:'雷雨作，百果草木皆甲坼。宜宽恕化解。'},
+            '1-6':{n:'山泽损',o:41,d:'山下有泽，损下益上。宜节制减损。'},
+            '3-4':{n:'风雷益',o:42,d:'风雷相益，损上益下。宜增益善行。'},
+            '6-7':{n:'泽天夬',o:43,d:'泽上于天，决而和。宜果敢决断。'},
+            '7-3':{n:'天风姤',o:44,d:'天下有风，不期而遇。宜谨慎应对。'},
+            '6-0':{n:'泽地萃',o:45,d:'泽上于地，万物萃聚。宜聚集人才。'},
+            '0-3':{n:'地风升',o:46,d:'地中生木，步步高升。宜循序渐进。'},
+            '6-2':{n:'泽水困',o:47,d:'泽无水，困穷之象。宜坚守正道。'},
+            '2-3':{n:'水风井',o:48,d:'木上有水，井养不穷。宜修德养民。'},
+            '6-5':{n:'泽火革',o:49,d:'泽中有火，变革之象。宜顺天应人。'},
+            '5-3':{n:'火风鼎',o:50,d:'木上有火，鼎烹之象。宜除旧布新。'},
+            '4-4':{n:'震为雷',o:51,d:'洊雷震，君子以恐惧修省。宜戒惧谨慎。'},
+            '1-1':{n:'艮为山',o:52,d:'兼山艮，思不出其位。宜知止守分。'},
+            '3-1':{n:'风山渐',o:53,d:'山上有木，渐长渐进。宜循序渐进。'},
+            '4-6':{n:'雷泽归妹',o:54,d:'泽上有雷，少女归嫁。宜慎重婚配。'},
+            '4-5':{n:'雷火丰',o:55,d:'雷电皆至，丰盛之象。宜居安思危。'},
+            '5-1':{n:'火山旅',o:56,d:'山上有火，旅居在外。宜谨慎行事。'},
+            '3-3':{n:'巽为风',o:57,d:'随风巽，申命行事。宜顺从天命。'},
+            '6-6':{n:'兑为泽',o:58,d:'丽泽兑，朋友讲习。宜和悦相处。'},
+            '3-2':{n:'风水涣',o:59,d:'风行水上，涣散分离。宜凝聚人心。'},
+            '2-6':{n:'水泽节',o:60,d:'泽上有水，节度有制。宜适可而止。'},
+            '3-6':{n:'风泽中孚',o:61,d:'泽上有风，诚信感化。宜以诚待人。'},
+            '4-1':{n:'雷山小过',o:62,d:'山上有雷，小有过越。宜纠偏守中。'},
+            '2-5':{n:'水火既济',o:63,d:'水在火上，事已成就。宜居安思危。'},
+            '5-2':{n:'火水未济',o:64,d:'火在水上，事未完成。宜继续努力。'}
         };
 
-        const BA_GUA = ['坤', '艮', '坎', '巽', '震', '离', '兑', '乾'];
-        let yao = [1,1,1,1,1,1]; // 1阳爻 0阴爻，索引0=初爻
+        let yao = [1,1,1,1,1,1]; // 1阳0阴
         let domain = '综合';
-        let loading = false;
         const LS_KEY = 'liuyao';
-
         const $ = id => document.getElementById(id);
-        const yaoSel = $('yaoSelector');
-        const guaName = $('guaName');
-        const guaTags = $('guaTags');
-        const btnExplain = $('btnExplain');
-        const modal = $('modal');
-        const modalBody = $('modalBody');
-        const modalTitle = $('modalTitle');
         const toast = $('toast');
 
-        function toastMsg(m) {
+        function showToast(m) {
             toast.textContent = m;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2000);
         }
 
         function getGuaKey() {
-            let upper = 0, lower = 0;
-            for(let i=3;i<6;i++) if(yao[i]) upper += 1 << (i-3);
-            for(let i=0;i<3;i++) if(yao[i]) lower += 1 << i;
+            let upper=0, lower=0;
+            for(let i=3;i<6;i++) if(yao[i]) upper += 1<<(i-3);
+            for(let i=0;i<3;i++) if(yao[i]) lower += 1<<i;
             return `${upper}-${lower}`;
         }
 
         function updateDisplay() {
-            yaoSel.innerHTML = '';
             const yaoNames = ['初','二','三','四','五','上'];
+            const sel = $('yaoSelector');
+            sel.innerHTML = '';
             for(let i=5;i>=0;i--) {
-                const isYang = yao[i];
-                const label = yaoNames[i] + '爻';
-                let yaoName;
-                if(i===0) yaoName = isYang ? '初九' : '初六';
-                else if(i===5) yaoName = isYang ? '上九' : '上六';
+                const yang = yao[i];
+                const label = yaoNames[i]+'爻';
+                let name;
+                if(i===0) name = yang?'初九':'初六';
+                else if(i===5) name = yang?'上九':'上六';
                 else {
-                    const midNames = ['二','三','四','五']; // 索引1->0,2->1,3->2,4->3
-                    const char = midNames[i-1];
-                    yaoName = isYang ? '九'+char : '六'+char;
+                    const mid = ['二','三','四','五'];
+                    name = yang?'九'+mid[i-1]:'六'+mid[i-1];
                 }
                 const row = document.createElement('div');
                 row.className = 'yao-row';
-                row.innerHTML = `<span class="yao-label">${label}</span><span class="yao-symbol ${isYang?'yang':'yin'}">${isYang?'━━━━━':'━ ━ ━'}</span><span style="font-size:0.7rem;">${yaoName}</span>`;
-                row.addEventListener('click', () => {
-                    yao[i] = yao[i] ? 0 : 1;
-                    updateDisplay();
-                });
-                yaoSel.appendChild(row);
+                row.innerHTML = `<span class="yao-label">${label}</span><span class="yao-symbol ${yang?'yang':'yin'}">${yang?'━━━━━':'━ ━ ━'}</span><span style="font-size:0.7rem;">${name}</span>`;
+                row.onclick = () => { yao[i] = yao[i]?0:1; updateDisplay(); };
+                sel.appendChild(row);
             }
             const key = getGuaKey();
             const info = GUA_DB[key];
             if(info) {
-                guaName.textContent = info.n;
-                guaTags.innerHTML = `第${info.o}卦 · ${info.d}`;
-                btnExplain.disabled = false;
+                $('guaName').textContent = info.n;
+                $('guaTags').innerHTML = `第${info.o}卦 · ${info.d}`;
+                $('btnExplain').disabled = false;
             } else {
-                guaName.textContent = '未知卦象';
-                guaTags.innerHTML = '';
-                btnExplain.disabled = true;
+                $('guaName').textContent = '未知卦象';
+                $('guaTags').innerHTML = '';
+                $('btnExplain').disabled = true;
             }
         }
 
         function showDomainModal() {
-            modalTitle.textContent = '选择领域';
-            modalBody.innerHTML = `
+            $('modalTitle').textContent = '选择领域';
+            $('modalBody').innerHTML = `
                 <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
                     ${['情感','事业','健康','学业','综合'].map(d => `<button class="domain-btn btn ${d===domain?'active':''}" data-d="${d}">${d}</button>`).join('')}
                 </div>
                 <div style="text-align:center;margin-top:16px;">
                     <button class="btn btn-primary" id="startBtn">开始解读</button>
-                </div>
-            `;
-            modalBody.querySelectorAll('.domain-btn').forEach(b => b.addEventListener('click', function() {
-                modalBody.querySelectorAll('.domain-btn').forEach(x => x.classList.remove('active'));
-                this.classList.add('active');
-                domain = this.dataset.d;
-            }));
-            modalBody.querySelector('#startBtn').addEventListener('click', startAI);
-            modal.classList.add('active');
+                </div>`;
+            $('modalBody').querySelectorAll('.domain-btn').forEach(b => {
+                b.onclick = function() {
+                    $('modalBody').querySelectorAll('.domain-btn').forEach(x => x.classList.remove('active'));
+                    this.classList.add('active');
+                    domain = this.dataset.d;
+                };
+            });
+            $('modalBody').querySelector('#startBtn').onclick = startAI;
+            $('modal').classList.add('active');
         }
 
         async function startAI() {
             const settings = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
-            if(!settings.apiKey) { toastMsg('请先设置API Key'); modal.classList.remove('active'); return; }
-            modalTitle.textContent = 'AI 解读中';
-            modalBody.innerHTML = '<span class="spinner"></span> 正在分析...';
-            loading = true;
+            if(!settings.apiKey) {
+                showToast('请先设置API Key');
+                $('modal').classList.remove('active');
+                return;
+            }
+            $('modalTitle').textContent = 'AI 解读中';
+            $('modalBody').innerHTML = '<span class="spinner"></span> 正在分析...';
             const key = getGuaKey();
             const info = GUA_DB[key];
             const yaoNames = ['初','二','三','四','五','上'];
-            const prompt = `卦：${info.n} (${info.d})，领域：${domain}，六爻：${yao.map((v,i) => yaoNames[i] + (v?'九':'六')).join('、')}。请直接简短解释。`;
+            const prompt = `卦：${info.n} (${info.d})，领域：${domain}，六爻：${yao.map((v,i)=>yaoNames[i]+(v?'九':'六')).join('、')}。请直接简短解释。`;
             try {
                 const res = await fetch('https://api.deepseek.com/chat/completions', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${settings.apiKey}` },
-                    body: JSON.stringify({ model: settings.apiModel || 'deepseek-v4-pro', messages: [{ role: 'user', content: prompt }], max_tokens: 300 })
+                    headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${settings.apiKey}` },
+                    body: JSON.stringify({
+                        model: settings.apiModel || 'deepseek-chat',
+                        messages: [{ role:'user', content: prompt }],
+                        max_tokens: 300
+                    })
                 });
+
+                if(!res.ok) {
+                    const err = await res.json().catch(()=>({}));
+                    throw new Error(err.error?.message || `HTTP ${res.status}`);
+                }
+
                 const data = await res.json();
-                modalBody.textContent = data.choices?.[0]?.message?.content || '无响应';
+                const text = data.choices?.[0]?.message?.content;
+                $('modalBody').textContent = text || 'AI返回了空内容，请重试或检查模型名称';
             } catch(e) {
-                modalBody.innerHTML = `<span style="color:#c0392b;">错误：${e.message}</span>`;
+                $('modalBody').innerHTML = `<span style="color:#c0392b;">错误：${e.message}</span>`;
             }
-            loading = false;
         }
 
         // 按钮事件
-        $('btnRandom').addEventListener('click', () => { yao = yao.map(() => Math.random()>0.5?1:0); updateDisplay(); toastMsg('随机卦象'); });
-        $('btnClear').addEventListener('click', () => { yao = [1,1,1,1,1,1]; updateDisplay(); toastMsg('重置为乾'); });
-        $('btnFlipAll').addEventListener('click', () => { yao = yao.map(v => v?0:1); updateDisplay(); toastMsg('全部翻转'); });
-        btnExplain.addEventListener('click', showDomainModal);
-        $('btnSettings').addEventListener('click', () => {
-            const panel = $('settingsPanel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-        });
-        $('btnSave').addEventListener('click', () => {
-            const settings = { apiKey: $('apiKey').value, apiModel: $('apiModel').value };
-            localStorage.setItem(LS_KEY, JSON.stringify(settings));
-            toastMsg('设置已保存');
+        $('btnRandom').onclick = () => { yao = yao.map(()=>Math.random()>0.5?1:0); updateDisplay(); showToast('随机卦象'); };
+        $('btnClear').onclick = () => { yao = [1,1,1,1,1,1]; updateDisplay(); showToast('重置为乾'); };
+        $('btnFlipAll').onclick = () => { yao = yao.map(v=>v?0:1); updateDisplay(); showToast('全部翻转'); };
+        $('btnExplain').onclick = showDomainModal;
+        $('btnSettings').onclick = () => {
+            const p = $('settingsPanel');
+            p.style.display = p.style.display === 'none' ? 'block' : 'none';
+        };
+        $('btnSave').onclick = () => {
+            const s = { apiKey:$('apiKey').value, apiModel:$('apiModel').value };
+            localStorage.setItem(LS_KEY, JSON.stringify(s));
+            showToast('设置已保存');
             $('settingsPanel').style.display = 'none';
-        });
-        $('modalClose').addEventListener('click', () => modal.classList.remove('active'));
-        modal.addEventListener('click', e => { if(e.target === modal) modal.classList.remove('active'); });
-        document.addEventListener('keydown', e => { if(e.key==='Escape') modal.classList.remove('active'); });
+        };
+        $('modalClose').onclick = () => $('modal').classList.remove('active');
+        $('modal').onclick = e => { if(e.target === $('modal')) $('modal').classList.remove('active'); };
+        document.onkeydown = e => { if(e.key==='Escape') $('modal').classList.remove('active'); };
 
-        // 加载设置并初始化显示
+        // 初始化
         (() => {
             const s = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
             $('apiKey').value = s.apiKey || '';
-            $('apiModel').value = s.apiModel || 'deepseek-v4-pro';
+            $('apiModel').value = s.apiModel || 'deepseek-chat';
             updateDisplay();
         })();
     </script>
