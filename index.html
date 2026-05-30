@@ -317,7 +317,8 @@
             const key_gua = getGuaKey();
             const info = GUA_DB[key_gua];
             const yaoNames = ['初','二','三','四','五','上'];
-            const prompt = `卦名：${info.n} (第${info.o}卦)。卦辞：${info.d}。领域：${domain}。六爻分别为：${yao.map((v,i)=>yaoNames[i]+(v?'九':'六')).join('、')}。请全面解读该卦象，涵盖六爻整体寓意，并结合【${domain}】领域给出针对性启示。要求：用清晰的分点形式（如1. 2. 3. ...）输出，每条要点完整，总字数约400字，避免只讲部分爻。`;
+            // 修改提示词，要求详细解读，总字数约800字
+            const prompt = `卦名：${info.n} (第${info.o}卦)。卦辞：${info.d}。领域：${domain}。六爻分别为：${yao.map((v,i)=>yaoNames[i]+(v?'九':'六')).join('、')}。请非常详细地解读该卦象，全面分析六爻的寓意、上下卦组合的哲理，以及整个卦对【${domain}】领域的深刻启示。要求：分点输出（如1. 2. 3. ...），每个要点充实展开，总字数约800字。避免只讲部分爻或过于简略。`;
             try {
                 const res = await fetch(`${base}/chat/completions`, {
                     method: 'POST',
@@ -325,7 +326,7 @@
                     body: JSON.stringify({
                         model: model,
                         messages: [{ role:'user', content: prompt }],
-                        max_tokens: 800
+                        max_tokens: 1200  // 增加上限，容纳更长回复
                     })
                 });
 
