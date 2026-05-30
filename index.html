@@ -3,1092 +3,1064 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>手势控制3D圣诞树粒子系统</title>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/EffectComposer.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/RenderPass.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/UnrealBloomPass.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/FilmPass.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/GlitchPass.min.js"></script>
-    <script src="https://unpkg.com/mediapipe-hands@0.4.1646424915/hands.js"></script>
+    <title>六爻占卜 - 周易六十四卦</title>
     <style>
+        :root {
+            --bg: #1a1a1f;
+            --panel-bg: #23232a;
+            --card-bg: #2a2a33;
+            --gold: #c9a96e;
+            --gold-light: #e0c88e;
+            --gold-dark: #9a7b3e;
+            --text: #e8e0d5;
+            --text-secondary: #b0a89a;
+            --text-muted: #7a7265;
+            --border: #3a3530;
+            --yang: #e8d5a3;
+            --yin: #a0b0c0;
+            --accent: #c9a96e;
+            --danger: #c0392b;
+            --success: #6b9b6b;
+            --radius: 10px;
+            --radius-sm: 6px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #000;
-            color: #fff;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-        }
-        
-        #container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-        
-        #canvas-container {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-        
-        #video-container {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 250px;
-            height: 200px;
-            z-index: 2;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            overflow: hidden;
-            border: 2px solid #D4AF37;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
-        }
-        
-        #video {
-            width: 100%;
-            height: 100%;
-            transform: scaleX(-1);
-        }
-        
-        #ui {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 3;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 350px;
-            border: 2px solid #B22222;
-            box-shadow: 0 0 15px rgba(178, 34, 34, 0.5);
-        }
-        
-        h1 {
-            color: #D4AF37;
-            margin-bottom: 10px;
-            font-size: 24px;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.7);
-        }
-        
-        .subtitle {
-            color: #2F4F2F;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        
-        .state-indicator {
-            background: rgba(47, 79, 47, 0.8);
-            padding: 10px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 4px solid #D4AF37;
-        }
-        
-        .state-title {
-            font-weight: bold;
-            color: #D4AF37;
-            margin-bottom: 5px;
-        }
-        
-        .state-description {
-            font-size: 13px;
-            color: #ccc;
-        }
-        
-        .gesture-list {
-            margin: 15px 0;
-        }
-        
-        .gesture-item {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Noto Serif SC', 'STSong', 'Songti SC', 'SimSun', 'KaiTi', '楷体', serif;
+            min-height: 100vh;
             display: flex;
-            align-items: center;
-            margin: 10px 0;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(201, 169, 110, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 30% 80%, rgba(201, 169, 110, 0.03) 0%, transparent 50%);
         }
-        
-        .gesture-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(178, 34, 34, 0.3);
-            border-radius: 50%;
+
+        .container {
+            width: 100%;
+            max-width: 640px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 10px 0 40px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 28px 20px 10px;
+        }
+        .header .icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 0 12px rgba(201, 169, 110, 0.4));
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+        .header h1 {
+            font-size: 2rem;
+            letter-spacing: 0.08em;
+            color: var(--gold-light);
+            font-weight: 700;
+            margin: 0;
+        }
+        .header .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            letter-spacing: 0.06em;
+            margin-top: 4px;
+        }
+
+        /* Main card */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        .card-title {
+            font-size: 0.95rem;
+            letter-spacing: 0.06em;
+            color: var(--gold);
+            margin-bottom: 18px;
+            text-align: center;
+            font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 12px;
-            font-size: 20px;
-            color: #D4AF37;
+            gap: 8px;
         }
-        
-        .gesture-text {
-            font-size: 14px;
+        .card-title::before,
+        .card-title::after {
+            content: '';
+            display: inline-block;
+            width: 24px;
+            height: 1px;
+            background: var(--gold-dark);
+            opacity: 0.6;
         }
-        
-        .upload-container {
-            margin-top: 20px;
+
+        /* Yao lines selector */
+        .yao-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
         }
-        
-        .upload-label {
-            display: block;
-            background: rgba(47, 79, 47, 0.8);
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
+        .yao-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+            max-width: 420px;
             cursor: pointer;
-            margin-bottom: 10px;
-            border: 1px dashed #D4AF37;
-            transition: all 0.3s;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            background: transparent;
+            border: 1px solid transparent;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
         }
-        
-        .upload-label:hover {
-            background: rgba(47, 79, 47, 1);
-            border-color: #B22222;
+        .yao-row:hover {
+            background: rgba(201, 169, 110, 0.06);
+            border-color: rgba(201, 169, 110, 0.2);
         }
-        
-        #photo-upload {
-            display: none;
+        .yao-row:active {
+            background: rgba(201, 169, 110, 0.12);
+            transform: scale(0.985);
+            transition: 0.1s;
         }
-        
-        #photo-count {
-            font-size: 12px;
+        .yao-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            width: 48px;
+            text-align: right;
+            letter-spacing: 0.04em;
+            flex-shrink: 0;
+            font-weight: 500;
+        }
+        .yao-display {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 42px;
+            transition: var(--transition);
+        }
+        .yao-symbol {
+            font-size: 1.8rem;
+            letter-spacing: 0.1em;
+            transition: var(--transition);
+            font-weight: bold;
+        }
+        .yao-symbol.yang {
+            color: var(--yang);
+            text-shadow: 0 0 8px rgba(232, 213, 163, 0.3);
+        }
+        .yao-symbol.yin {
+            color: var(--yin);
+            letter-spacing: 0.05em;
+        }
+        .yao-indicator {
+            width: 36px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: left;
+            flex-shrink: 0;
+            letter-spacing: 0.04em;
+            transition: var(--transition);
+        }
+        .yao-indicator.active-yang {
+            color: var(--yang);
+        }
+        .yao-indicator.active-yin {
+            color: var(--yin);
+        }
+        .yao-divider {
+            width: 60%;
+            height: 1px;
+            background: var(--border);
+            opacity: 0.5;
+            margin: 2px auto;
+            border: none;
+        }
+
+        /* Result section */
+        .result-area {
             text-align: center;
-            color: #aaa;
+            margin-top: 8px;
+            padding: 16px 0 0;
+            border-top: 1px solid var(--border);
         }
-        
-        .current-state {
-            position: absolute;
-            bottom: 20px;
+        .gua-name {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            letter-spacing: 0.08em;
+            margin: 6px 0;
+            transition: var(--transition);
+        }
+        .gua-tags {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 8px 0;
+        }
+        .gua-tag {
+            font-size: 0.78rem;
+            background: rgba(201, 169, 110, 0.1);
+            color: var(--gold);
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 0.04em;
+            border: 1px solid rgba(201, 169, 110, 0.2);
+        }
+        .gua-number {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        /* Hexagram visual */
+        .hexagram-visual {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            margin: 16px 0;
+            padding: 14px 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-sm);
+        }
+        .hex-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 32px;
+            transition: var(--transition);
+        }
+        .hex-line .bar {
+            height: 5px;
+            border-radius: 3px;
+            transition: var(--transition);
+        }
+        .hex-line.yang .bar {
+            width: 100px;
+            background: var(--yang);
+            box-shadow: 0 0 6px rgba(232, 213, 163, 0.3);
+        }
+        .hex-line.yin .bar-left,
+        .hex-line.yin .bar-right {
+            width: 40px;
+            height: 5px;
+            border-radius: 3px;
+            background: var(--yin);
+            box-shadow: 0 0 4px rgba(160, 176, 192, 0.25);
+        }
+        .hex-line.yin .gap {
+            width: 20px;
+        }
+        .hex-line-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            width: 36px;
+            text-align: right;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 11px 22px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text);
+            transition: var(--transition);
+            font-family: inherit;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn:hover {
+            border-color: var(--gold-dark);
+            background: rgba(201, 169, 110, 0.08);
+        }
+        .btn:active {
+            transform: scale(0.96);
+            transition: 0.1s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #b8943e, #9a7b3e);
+            color: #1a1a1f;
+            border: none;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            box-shadow: 0 2px 12px rgba(201, 169, 110, 0.25);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #c9a450, #a88540);
+            box-shadow: 0 4px 18px rgba(201, 169, 110, 0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+            filter: grayscale(30%);
+        }
+        .btn-sm {
+            padding: 7px 14px;
+            font-size: 0.78rem;
+            border-radius: 20px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        /* AI explanation area */
+        .explanation-box {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px 18px;
+            margin-top: 14px;
+            min-height: 60px;
+            font-size: 0.88rem;
+            line-height: 1.7;
+            letter-spacing: 0.03em;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            white-space: pre-wrap;
+            word-break: break-word;
+            text-align: left;
+        }
+        .explanation-box.loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Settings panel */
+        .settings-toggle {
+            text-align: center;
+            margin-top: 4px;
+        }
+        .settings-toggle button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.8rem;
+            letter-spacing: 0.04em;
+            font-family: inherit;
+            padding: 6px 14px;
+            border-radius: 20px;
+            transition: var(--transition);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .settings-toggle button:hover {
+            color: var(--gold);
+            background: rgba(201, 169, 110, 0.06);
+        }
+        .settings-panel {
+            display: none;
+            margin-top: 10px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+        .settings-panel.open {
+            display: block;
+        }
+        .settings-panel label {
+            display: block;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-bottom: 3px;
+            letter-spacing: 0.04em;
+        }
+        .settings-panel input,
+        .settings-panel select {
+            width: 100%;
+            padding: 9px 12px;
+            margin-bottom: 10px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            letter-spacing: 0.03em;
+        }
+        .settings-panel input:focus,
+        .settings-panel select:focus {
+            outline: none;
+            border-color: var(--gold-dark);
+            box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.1);
+        }
+        .settings-panel input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 3;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 12px 25px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: bold;
-            color: #D4AF37;
-            border: 2px solid #B22222;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.7);
-            transition: all 0.5s;
+            background: #2a2a33;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            letter-spacing: 0.04em;
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            box-shadow: var(--shadow);
+            font-family: inherit;
         }
-        
-        .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.9);
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            border: 2px solid #D4AF37;
+        .toast.show {
+            opacity: 1;
         }
-        
-        .loading-spinner {
-            border: 5px solid rgba(47, 79, 47, 0.3);
-            border-top: 5px solid #D4AF37;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .photo-frame {
-            position: absolute;
-            z-index: 5;
-            background: rgba(0, 0, 0, 0.9);
-            border: 15px solid #D4AF37;
-            border-image: linear-gradient(45deg, #D4AF37, #B22222, #2F4F2F) 1;
-            display: none;
-            box-shadow: 0 0 50px rgba(212, 175, 55, 0.8);
-            overflow: hidden;
-        }
-        
-        .photo-content {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        
-        .close-photo {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #B22222;
-            color: white;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            font-size: 18px;
-            cursor: pointer;
-            z-index: 6;
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            .yao-symbol {
+                font-size: 1.4rem;
+            }
+            .hex-line .bar {
+                width: 70px;
+            }
+            .hex-line.yin .bar-left,
+            .hex-line.yin .bar-right {
+                width: 28px;
+            }
+            .hex-line.yin .gap {
+                width: 14px;
+            }
+            .yao-label {
+                width: 36px;
+                font-size: 0.7rem;
+            }
+            .yao-indicator {
+                width: 28px;
+                font-size: 0.7rem;
+            }
+            .card {
+                padding: 16px 12px;
+            }
+            .btn {
+                padding: 9px 16px;
+                font-size: 0.8rem;
+            }
+            .gua-name {
+                font-size: 1.3rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="container">
-        <div id="canvas-container"></div>
-        
-        <div id="video-container">
-            <video id="video" playsinline></video>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <span class="icon">☯</span>
+            <h1>六爻占卜</h1>
+            <p class="subtitle">周易六十四卦 · 从下往上设爻</p>
         </div>
-        
-        <div id="ui">
-            <h1>手势控制3D圣诞树</h1>
-            <div class="subtitle">结合Three.js与MediaPipe Hands的交互式粒子系统</div>
-            
-            <div class="state-indicator">
-                <div class="state-title">系统状态</div>
-                <div class="state-description" id="state-text">初始化中...</div>
+
+        <!-- Yao Selector Card -->
+        <div class="card" id="selectorCard">
+            <div class="card-title">选择六爻（从下往上）</div>
+            <div class="yao-selector" id="yaoSelector">
+                <!-- 6 yao rows, from bottom (初爻) to top (上爻) -->
             </div>
-            
-            <div class="gesture-list">
-                <div class="gesture-item">
-                    <div class="gesture-icon">✊</div>
-                    <div class="gesture-text">握拳 - 回到合拢态（圣诞树形态）</div>
-                </div>
-                <div class="gesture-item">
-                    <div class="gesture-icon">🖐️</div>
-                    <div class="gesture-text">张开手掌 - 进入散开态（粒子漂浮）</div>
-                </div>
-                <div class="gesture-item">
-                    <div class="gesture-icon">↻</div>
-                    <div class="gesture-text">手部旋转 - 在散开态下旋转视角</div>
-                </div>
-                <div class="gesture-item">
-                    <div class="gesture-icon">🤏</div>
-                    <div class="gesture-text">抓取手势 - 放大选中照片</div>
-                </div>
-            </div>
-            
-            <div class="upload-container">
-                <label for="photo-upload" class="upload-label">
-                    📷 上传照片添加到圣诞树
-                </label>
-                <input type="file" id="photo-upload" accept="image/*" multiple>
-                <div id="photo-count">已加载 0 张照片</div>
+            <div class="btn-group">
+                <button class="btn btn-sm" id="btnRandom" title="随机生成一卦">🎲 随机卦象</button>
+                <button class="btn btn-sm" id="btnClear" title="全部重置为阳爻">↺ 重置</button>
+                <button class="btn btn-sm" id="btnFlipAll" title="翻转全部爻位">⇄ 全部翻转</button>
             </div>
         </div>
-        
-        <div class="current-state" id="current-state">初始化中...</div>
-        
-        <div class="loading" id="loading">
-            <div class="loading-spinner"></div>
-            <div>加载模型中，请稍候...</div>
+
+        <!-- Result Card -->
+        <div class="card" id="resultCard">
+            <div class="card-title">卦象结果</div>
+            <div class="hexagram-visual" id="hexagramVisual">
+                <!-- Visual hexagram from bottom to top -->
+            </div>
+            <div class="result-area">
+                <div class="gua-number" id="guaNumber"></div>
+                <div class="gua-name" id="guaName">—</div>
+                <div class="gua-tags" id="guaTags"></div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" id="btnExplain" disabled>🔮 AI 解卦</button>
+            </div>
+            <div class="explanation-box" id="explanationBox">
+                <span style="color:var(--text-muted);">点击「AI 解卦」获取详细解释</span>
+            </div>
+            <!-- Local basic info fallback -->
+            <div id="localInfo" style="margin-top:10px;font-size:0.8rem;color:var(--text-muted);text-align:center;letter-spacing:0.03em;"></div>
         </div>
-        
-        <div class="photo-frame" id="photo-frame">
-            <button class="close-photo" id="close-photo">×</button>
-            <img class="photo-content" id="photo-content" src="" alt="放大照片">
+
+        <!-- Settings -->
+        <div class="settings-toggle">
+            <button id="btnToggleSettings">⚙️ API 设置</button>
+        </div>
+        <div class="settings-panel" id="settingsPanel">
+            <label for="apiKey">API Key</label>
+            <input type="password" id="apiKey" placeholder="sk-... 或您的API密钥">
+            <label for="apiBase">API Base URL</label>
+            <input type="text" id="apiBase" placeholder="https://api.openai.com/v1">
+            <label for="apiModel">模型名称</label>
+            <input type="text" id="apiModel" placeholder="gpt-4o-mini">
+            <label for="apiSystemPrompt">System Prompt（自定义AI指令）</label>
+            <input type="text" id="apiSystemPrompt" placeholder="默认：简短直接解释卦象，无需开场白">
+            <div class="btn-group" style="margin-top:12px;">
+                <button class="btn btn-sm" id="btnSaveSettings">💾 保存设置</button>
+                <button class="btn btn-sm" id="btnResetSettings">↺ 恢复默认</button>
+            </div>
+            <p style="font-size:0.7rem;color:var(--text-muted);margin-top:8px;text-align:center;">
+                ⚠️ API Key 仅存储在浏览器本地，不会上传到任何第三方服务器
+            </p>
         </div>
     </div>
 
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
     <script>
-        // 主应用程序
-        class ChristmasTreeApp {
-            constructor() {
-                // 系统状态
-                this.STATES = {
-                    CLOSED: 'closed',      // 合拢态
-                    SCATTERED: 'scattered', // 散开态
-                    PHOTO_ZOOM: 'photo_zoom' // 照片放大态
-                };
-                
-                this.currentState = this.STATES.CLOSED;
-                this.previousState = null;
-                this.photos = [];
-                this.photoTextures = [];
-                this.photoMeshes = [];
-                this.selectedPhoto = null;
-                
-                // 手势检测参数
-                this.lastHandPosition = { x: 0, y: 0, z: 0 };
-                this.lastHandRotation = 0;
-                this.gestureHistory = [];
-                this.gestureHistoryMax = 10;
-                
-                // 相机控制参数
-                this.cameraAngle = { x: 0, y: 0 };
-                this.targetCameraAngle = { x: 0, y: 0 };
-                
-                // 动画参数
-                this.transitionProgress = 1.0;
-                this.transitionDuration = 1.5;
-                
-                // 初始化
-                this.initThreeJS();
-                this.initMediaPipe();
-                this.initEventListeners();
-                this.createChristmasTree();
-                this.animate();
-                
-                // 更新UI
-                this.updateStateUI();
+        (function() {
+            // ============ 64卦完整数据库 ============
+            // 八卦：用0-7表示，三位二进制从下往上(初爻,二爻,三爻)
+            // 0=坤(000) 1=艮(001) 2=坎(010) 3=巽(011) 4=震(100) 5=离(101) 6=兑(110) 7=乾(111)
+            const BA_GUA_NAMES = ['坤', '艮', '坎', '巽', '震', '离', '兑', '乾'];
+            const BA_GUA_SYMBOLS = ['☷', '☶', '☵', '☴', '☳', '☲', '☱', '☰'];
+            const BA_GUA_ELEMENTS = ['地', '山', '水', '风', '雷', '火', '泽', '天'];
+
+            // 64卦数据库：key = "上卦数字-下卦数字"
+            const GUA_DATABASE = {
+                '7-7': { name: '乾为天', order: 1, desc: '乾上乾下，纯阳之卦。元亨利贞，自强不息。象征天行健，君子以自强不息。' },
+                '0-0': { name: '坤为地', order: 2, desc: '坤上坤下，纯阴之卦。元亨，利牝马之贞。象征地势坤，君子以厚德载物。' },
+                '2-4': { name: '水雷屯', order: 3, desc: '坎上震下，屯难之卦。万物始生，艰难重重。宜守正待时。' },
+                '1-2': { name: '山水蒙', order: 4, desc: '艮上坎下，蒙昧之卦。山下有险，启蒙发智。需耐心引导。' },
+                '2-7': { name: '水天需', order: 5, desc: '坎上乾下，需待之卦。云上于天，待时而雨。宜静候时机。' },
+                '7-2': { name: '天水讼', order: 6, desc: '乾上坎下，争讼之卦。天与水违行，宜和解不宜争斗。' },
+                '0-2': { name: '地水师', order: 7, desc: '坤上坎下，师旅之卦。地中有水，聚众用兵。宜师出有名。' },
+                '2-0': { name: '水地比', order: 8, desc: '坎上坤下，亲比之卦。地上有水，万物亲附。宜团结协作。' },
+                '3-7': { name: '风天小畜', order: 9, desc: '巽上乾下，小畜之卦。风行天上，小有积蓄。宜积小成大。' },
+                '7-6': { name: '天泽履', order: 10, desc: '乾上兑下，履践之卦。上天下泽，循礼而行。宜谨慎行事。' },
+                '0-7': { name: '地天泰', order: 11, desc: '坤上乾下，通泰之卦。天地交而万物通，上下交而其志同。大吉。' },
+                '7-0': { name: '天地否', order: 12, desc: '乾上坤下，否塞之卦。天地不交，万物不通。宜退守自保。' },
+                '7-5': { name: '天火同人', order: 13, desc: '乾上离下，同人之卦。天与火同，类族辨物。宜广结善缘。' },
+                '5-7': { name: '火天大有', order: 14, desc: '离上乾下，大有之卦。火在天上，无所不照。丰收大有之年。' },
+                '0-1': { name: '地山谦', order: 15, desc: '坤上艮下，谦逊之卦。地中有山，卑以自牧。谦受益，满招损。' },
+                '4-0': { name: '雷地豫', order: 16, desc: '震上坤下，豫乐之卦。雷出地奋，和乐愉悦。宜顺势而动。' },
+                '6-4': { name: '泽雷随', order: 17, desc: '兑上震下，随从之卦。泽中有雷，随时而动。宜顺应时势。' },
+                '1-3': { name: '山风蛊', order: 18, desc: '艮上巽下，蛊坏之卦。山下有风，物腐虫生。宜整治弊病。' },
+                '0-6': { name: '地泽临', order: 19, desc: '坤上兑下，临下之卦。地临泽上，君临天下。宜亲民治事。' },
+                '3-0': { name: '风地观', order: 20, desc: '巽上坤下，观览之卦。风行地上，周观四方。宜审时度势。' },
+                '5-4': { name: '火雷噬嗑', order: 21, desc: '离上震下，噬嗑之卦。雷电交加，刑狱断案。宜明断是非。' },
+                '1-5': { name: '山火贲', order: 22, desc: '艮上离下，贲饰之卦。山下有火，文饰之美。宜注重内涵。' },
+                '1-0': { name: '山地剥', order: 23, desc: '艮上坤下，剥落之卦。山附于地，剥蚀衰落。宜守正待时。' },
+                '0-4': { name: '地雷复', order: 24, desc: '坤上震下，复归之卦。雷在地中，一阳来复。宜回归正道。' },
+                '7-4': { name: '天雷无妄', order: 25, desc: '乾上震下，无妄之卦。天下雷行，真实无妄。宜诚实守正。' },
+                '1-7': { name: '山天大畜', order: 26, desc: '艮上乾下，大畜之卦。天在山中，厚积薄发。宜蓄养待发。' },
+                '1-4': { name: '山雷颐', order: 27, desc: '艮上震下，颐养之卦。山下有雷，养正之道。宜自食其力。' },
+                '6-3': { name: '泽风大过', order: 28, desc: '兑上巽下，大过之卦。泽灭木，过犹不及。宜调整平衡。' },
+                '2-2': { name: '坎为水', order: 29, desc: '坎上坎下，重险之卦。水流不息，习坎行险。宜诚信守中。' },
+                '5-5': { name: '离为火', order: 30, desc: '离上离下，重明之卦。日月丽天，光明继照。宜依附中正。' },
+                '6-1': { name: '泽山咸', order: 31, desc: '兑上艮下，感应之卦。山上有泽，男女感应。宜以诚相待。' },
+                '4-3': { name: '雷风恒', order: 32, desc: '震上巽下，恒久之卦。雷风相与，恒久不变。宜持之以恒。' },
+                '7-1': { name: '天山遁', order: 33, desc: '乾上艮下，退避之卦。天下有山，君子退隐。宜适时退避。' },
+                '4-7': { name: '雷天大壮', order: 34, desc: '震上乾下，大壮之卦。雷在天上，声势壮大。宜守正防过。' },
+                '5-0': { name: '火地晋', order: 35, desc: '离上坤下，晋进之卦。明出地上，光明上进。宜稳步前进。' },
+                '0-5': { name: '地火明夷', order: 36, desc: '坤上离下，明夷之卦。明入地中，光明受伤。宜韬光养晦。' },
+                '3-5': { name: '风火家人', order: 37, desc: '巽上离下，家人之卦。风自火出，家道兴旺。宜和睦治家。' },
+                '5-6': { name: '火泽睽', order: 38, desc: '离上兑下，乖睽之卦。上火下泽，二女同居。宜求同存异。' },
+                '2-1': { name: '水山蹇', order: 39, desc: '坎上艮下，蹇难之卦。山上有水，险阻难行。宜反求诸己。' },
+                '4-2': { name: '雷水解', order: 40, desc: '震上坎下，解缓之卦。雷雨作而百果草木皆甲坼。宜宽恕化解。' },
+                '1-6': { name: '山泽损', order: 41, desc: '艮上兑下，损减之卦。山下有泽，损下益上。宜节制减损。' },
+                '3-4': { name: '风雷益', order: 42, desc: '巽上震下，增益之卦。风雷相益，损上益下。宜增益善行。' },
+                '6-7': { name: '泽天夬', order: 43, desc: '兑上乾下，决断之卦。泽上于天，决而和。宜果敢决断。' },
+                '7-3': { name: '天风姤', order: 44, desc: '乾上巽下，邂逅之卦。天下有风，不期而遇。宜谨慎应对。' },
+                '6-0': { name: '泽地萃', order: 45, desc: '兑上坤下，萃聚之卦。泽上于地，万物萃聚。宜聚集人才。' },
+                '0-3': { name: '地风升', order: 46, desc: '坤上巽下，上升之卦。地中生木，步步高升。宜循序渐进。' },
+                '6-2': { name: '泽水困', order: 47, desc: '兑上坎下，困厄之卦。泽无水，困穷之象。宜坚守正道。' },
+                '2-3': { name: '水风井', order: 48, desc: '坎上巽下，井养之卦。木上有水，井养不穷。宜修德养民。' },
+                '6-5': { name: '泽火革', order: 49, desc: '兑上离下，变革之卦。泽中有火，二女同居。宜顺天应人。' },
+                '5-3': { name: '火风鼎', order: 50, desc: '离上巽下，鼎新之卦。木上有火，鼎烹之象。宜除旧布新。' },
+                '4-4': { name: '震为雷', order: 51, desc: '震上震下，重雷之卦。洊雷震，君子以恐惧修省。宜戒惧谨慎。' },
+                '1-1': { name: '艮为山', order: 52, desc: '艮上艮下，重山之卦。兼山艮，君子以思不出其位。宜知止守分。' },
+                '3-1': { name: '风山渐', order: 53, desc: '巽上艮下，渐进之卦。山上有木，渐长渐进。宜循序渐进。' },
+                '4-6': { name: '雷泽归妹', order: 54, desc: '震上兑下，归妹之卦。泽上有雷，少女归嫁。宜慎重婚配。' },
+                '4-5': { name: '雷火丰', order: 55, desc: '震上离下，丰大之卦。雷电皆至，丰盛之象。宜居安思危。' },
+                '5-1': { name: '火山旅', order: 56, desc: '离上艮下，旅居之卦。山上有火，旅居在外。宜谨慎行事。' },
+                '3-3': { name: '巽为风', order: 57, desc: '巽上巽下，重风之卦。随风巽，君子以申命行事。宜顺从天命。' },
+                '6-6': { name: '兑为泽', order: 58, desc: '兑上兑下，重泽之卦。丽泽兑，君子以朋友讲习。宜和悦相处。' },
+                '3-2': { name: '风水涣', order: 59, desc: '巽上坎下，涣散之卦。风行水上，涣散分离。宜凝聚人心。' },
+                '2-6': { name: '水泽节', order: 60, desc: '坎上兑下，节制之卦。泽上有水，节度有制。宜适可而止。' },
+                '3-6': { name: '风泽中孚', order: 61, desc: '巽上兑下，中孚之卦。泽上有风，诚信感化。宜以诚待人。' },
+                '4-1': { name: '雷山小过', order: 62, desc: '震上艮下，小过之卦。山上有雷，小有过越。宜纠偏守中。' },
+                '2-5': { name: '水火既济', order: 63, desc: '坎上离下，既济之卦。水在火上，事已成就。宜居安思危。' },
+                '5-2': { name: '火水未济', order: 64, desc: '离上坎下，未济之卦。火在水上，事未完成。宜继续努力。' },
+            };
+
+            // ============ 状态 ============
+            // yaoValues: 6个爻位，索引0=初爻(最下), 索引5=上爻(最上)
+            // true=阳爻(—), false=阴爻(- -)
+            let yaoValues = [true, true, true, true, true, true]; // 默认全阳(乾为天)
+            let currentGuaKey = null;
+            let isExplaining = false;
+
+            // ============ DOM引用 ============
+            const yaoSelector = document.getElementById('yaoSelector');
+            const hexagramVisual = document.getElementById('hexagramVisual');
+            const guaName = document.getElementById('guaName');
+            const guaNumber = document.getElementById('guaNumber');
+            const guaTags = document.getElementById('guaTags');
+            const explanationBox = document.getElementById('explanationBox');
+            const localInfo = document.getElementById('localInfo');
+            const btnExplain = document.getElementById('btnExplain');
+            const btnRandom = document.getElementById('btnRandom');
+            const btnClear = document.getElementById('btnClear');
+            const btnFlipAll = document.getElementById('btnFlipAll');
+            const btnToggleSettings = document.getElementById('btnToggleSettings');
+            const settingsPanel = document.getElementById('settingsPanel');
+            const btnSaveSettings = document.getElementById('btnSaveSettings');
+            const btnResetSettings = document.getElementById('btnResetSettings');
+            const toast = document.getElementById('toast');
+
+            // ============ 设置管理 ============
+            const DEFAULT_SETTINGS = {
+                apiKey: '',
+                apiBase: 'https://api.openai.com/v1',
+                apiModel: 'gpt-4o-mini',
+                apiSystemPrompt: '你是一位精通周易六十四卦的专家。请直接对以下卦象进行简短精炼的解释，涵盖卦名含义、核心寓意、对问卦者的启示。直接输出解释内容，不需要任何开场白、问候语或确认语句。控制在200字以内。结合网络搜索结果进行补充说明（如有）。',
+            };
+
+            function loadSettings() {
+                try {
+                    const saved = localStorage.getItem('liuyao_settings');
+                    if (saved) {
+                        return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+                    }
+                } catch (e) { /* ignore */ }
+                return { ...DEFAULT_SETTINGS };
             }
-            
-            // 初始化Three.js
-            initThreeJS() {
-                // 场景
-                this.scene = new THREE.Scene();
-                this.scene.fog = new THREE.Fog(0x000000, 10, 50);
-                
-                // 相机
-                this.camera = new THREE.PerspectiveCamera(
-                    60, window.innerWidth / window.innerHeight, 0.1, 1000
-                );
-                this.camera.position.set(0, 5, 15);
-                
-                // 渲染器
-                this.renderer = new THREE.WebGLRenderer({ 
-                    antialias: true, 
-                    alpha: true 
-                });
-                this.renderer.setSize(window.innerWidth, window.innerHeight);
-                this.renderer.setPixelRatio(window.devicePixelRatio);
-                this.renderer.shadowMap.enabled = true;
-                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-                
-                // 添加到DOM
-                document.getElementById('canvas-container').appendChild(this.renderer.domElement);
-                
-                // 后期处理
-                this.composer = new THREE.EffectComposer(this.renderer);
-                const renderPass = new THREE.RenderPass(this.scene, this.camera);
-                this.composer.addPass(renderPass);
-                
-                // 辉光效果
-                const bloomPass = new THREE.UnrealBloomPass(
-                    new THREE.Vector2(window.innerWidth, window.innerHeight),
-                    1.5, 0.4, 0.85
-                );
-                bloomPass.threshold = 0.2;
-                bloomPass.strength = 1.2;
-                bloomPass.radius = 0.8;
-                this.composer.addPass(bloomPass);
-                
-                // 电影感效果
-                const filmPass = new THREE.FilmPass(0.35, 0.025, 648, false);
-                this.composer.addPass(filmPass);
-                
-                // 灯光
-                this.createLights();
-                
-                // 窗口大小调整
-                window.addEventListener('resize', () => this.onWindowResize());
+
+            function saveSettings(settings) {
+                try {
+                    localStorage.setItem('liuyao_settings', JSON.stringify(settings));
+                } catch (e) { /* ignore */ }
             }
-            
-            // 创建灯光
-            createLights() {
-                // 环境光
-                const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-                this.scene.add(ambientLight);
-                
-                // 主光源（金色）
-                const mainLight = new THREE.DirectionalLight(0xD4AF37, 1.5);
-                mainLight.position.set(5, 10, 7);
-                mainLight.castShadow = true;
-                mainLight.shadow.mapSize.width = 2048;
-                mainLight.shadow.mapSize.height = 2048;
-                this.scene.add(mainLight);
-                
-                // 红色补光
-                const redLight = new THREE.PointLight(0xB22222, 1.2, 30);
-                redLight.position.set(-5, 3, -5);
-                this.scene.add(redLight);
-                
-                // 绿色补光
-                const greenLight = new THREE.PointLight(0x2F4F2F, 0.8, 30);
-                greenLight.position.set(5, 2, -5);
-                this.scene.add(greenLight);
-                
-                // 辉光点光源
-                const glowLight = new THREE.PointLight(0xD4AF37, 2, 20);
-                glowLight.position.set(0, 8, 0);
-                this.scene.add(glowLight);
+
+            function populateSettingsForm(settings) {
+                document.getElementById('apiKey').value = settings.apiKey || '';
+                document.getElementById('apiBase').value = settings.apiBase || DEFAULT_SETTINGS.apiBase;
+                document.getElementById('apiModel').value = settings.apiModel || DEFAULT_SETTINGS.apiModel;
+                document.getElementById('apiSystemPrompt').value = settings.apiSystemPrompt || DEFAULT_SETTINGS
+                    .apiSystemPrompt;
             }
-            
-            // 创建圣诞树元素
-            createChristmasTree() {
-                // 清空现有元素
-                this.treeElements = [];
-                this.photoMeshes = [];
-                
-                // 创建圣诞树圆锥体结构
-                const treeHeight = 12;
-                const treeRadius = 4;
-                const layerCount = 8;
-                
-                // 颜色定义
-                const matteGreen = new THREE.Color(0x2F4F2F);
-                const metallicGold = new THREE.Color(0xD4AF37);
-                const christmasRed = new THREE.Color(0xB22222);
-                
-                for (let layer = 0; layer < layerCount; layer++) {
-                    const layerHeight = treeHeight * (layer / layerCount);
-                    const layerRadius = treeRadius * (1 - layer / layerCount);
-                    const elementsInLayer = Math.max(3, Math.floor(8 * (layer / layerCount + 0.5)));
-                    
-                    for (let i = 0; i < elementsInLayer; i++) {
-                        const angle = (i / elementsInLayer) * Math.PI * 2;
-                        const radius = layerRadius * (0.7 + Math.random() * 0.3);
-                        
-                        // 随机选择元素类型
-                        const elementType = Math.floor(Math.random() * 4);
-                        let element;
-                        
-                        switch (elementType) {
-                            case 0: // 球体
-                                element = this.createSphere(
-                                    radius * Math.cos(angle),
-                                    layerHeight - treeHeight/2,
-                                    radius * Math.sin(angle),
-                                    metallicGold
-                                );
-                                break;
-                            case 1: // 立方体
-                                element = this.createCube(
-                                    radius * Math.cos(angle),
-                                    layerHeight - treeHeight/2,
-                                    radius * Math.sin(angle),
-                                    christmasRed
-                                );
-                                break;
-                            case 2: // 糖果棍
-                                element = this.createCandyStick(
-                                    radius * Math.cos(angle),
-                                    layerHeight - treeHeight/2,
-                                    radius * Math.sin(angle)
-                                );
-                                break;
-                            case 3: // 照片云
-                                element = this.createPhotoCloud(
-                                    radius * Math.cos(angle),
-                                    layerHeight - treeHeight/2,
-                                    radius * Math.sin(angle)
-                                );
-                                break;
-                        }
-                        
-                        // 保存初始位置（合拢态位置）
-                        element.userData.closedPosition = new THREE.Vector3(
-                            radius * Math.cos(angle),
-                            layerHeight - treeHeight/2,
-                            radius * Math.sin(angle)
-                        );
-                        
-                        // 生成随机散开位置
-                        element.userData.scatteredPosition = new THREE.Vector3(
-                            (Math.random() - 0.5) * 20,
-                            (Math.random() - 0.5) * 10,
-                            (Math.random() - 0.5) * 20
-                        );
-                        
-                        // 随机旋转和缩放
-                        element.userData.rotationSpeed = {
-                            x: (Math.random() - 0.5) * 0.02,
-                            y: (Math.random() - 0.5) * 0.02,
-                            z: (Math.random() - 0.5) * 0.02
-                        };
-                        
-                        element.userData.scale = 0.8 + Math.random() * 0.4;
-                        element.scale.setScalar(element.userData.scale);
-                        
-                        this.treeElements.push(element);
-                        this.scene.add(element);
+
+            let currentSettings = loadSettings();
+            populateSettingsForm(currentSettings);
+
+            // ============ Toast ============
+            let toastTimer;
+
+            function showToast(msg) {
+                clearTimeout(toastTimer);
+                toast.textContent = msg;
+                toast.classList.add('show');
+                toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2200);
+            }
+
+            // ============ 计算卦象 ============
+            function getTrigramValue(startIndex) {
+                // startIndex: 0=下卦(初爻,二爻,三爻), 3=上卦(四爻,五爻,上爻)
+                let val = 0;
+                for (let i = 0; i < 3; i++) {
+                    if (yaoValues[startIndex + i]) {
+                        val += (1 << i); // 从下往上，低位=初爻
                     }
                 }
-                
-                // 树顶星形
-                const star = this.createStar(0, treeHeight/2, 0);
-                star.userData.closedPosition = new THREE.Vector3(0, treeHeight/2, 0);
-                star.userData.scatteredPosition = new THREE.Vector3(
-                    (Math.random() - 0.5) * 15,
-                    5 + Math.random() * 5,
-                    (Math.random() - 0.5) * 15
-                );
-                this.treeElements.push(star);
-                this.scene.add(star);
-                
-                // 添加一些粒子
-                this.createParticles();
+                return val; // 0-7
             }
-            
-            // 创建球体
-            createSphere(x, y, z, color) {
-                const geometry = new THREE.SphereGeometry(0.3, 16, 16);
-                const material = new THREE.MeshStandardMaterial({
-                    color: color,
-                    metalness: 0.8,
-                    roughness: 0.2,
-                    emissive: color,
-                    emissiveIntensity: 0.2
-                });
-                const sphere = new THREE.Mesh(geometry, material);
-                sphere.position.set(x, y, z);
-                sphere.castShadow = true;
-                sphere.receiveShadow = true;
-                return sphere;
+
+            function getGuaKey() {
+                const upperVal = getTrigramValue(3); // 上卦(四爻,五爻,上爻)
+                const lowerVal = getTrigramValue(0); // 下卦(初爻,二爻,三爻)
+                return `${upperVal}-${lowerVal}`;
             }
-            
-            // 创建立方体
-            createCube(x, y, z, color) {
-                const geometry = new THREE.BoxGeometry(0.4, 0.4, 0.4);
-                const material = new THREE.MeshStandardMaterial({
-                    color: color,
-                    metalness: 0.7,
-                    roughness: 0.3,
-                    emissive: color,
-                    emissiveIntensity: 0.1
-                });
-                const cube = new THREE.Mesh(geometry, material);
-                cube.position.set(x, y, z);
-                cube.castShadow = true;
-                cube.receiveShadow = true;
-                return cube;
+
+            function getGuaInfo() {
+                const key = getGuaKey();
+                const info = GUA_DATABASE[key];
+                const upperVal = getTrigramValue(3);
+                const lowerVal = getTrigramValue(0);
+                return {
+                    key,
+                    info,
+                    upperVal,
+                    lowerVal,
+                    upperName: BA_GUA_NAMES[upperVal],
+                    lowerName: BA_GUA_NAMES[lowerVal],
+                    upperSymbol: BA_GUA_SYMBOLS[upperVal],
+                    lowerSymbol: BA_GUA_SYMBOLS[lowerVal],
+                    upperElement: BA_GUA_ELEMENTS[upperVal],
+                    lowerElement: BA_GUA_ELEMENTS[lowerVal],
+                };
             }
-            
-            // 创建糖果棍
-            createCandyStick(x, y, z) {
-                const group = new THREE.Group();
-                
-                // 棍子
-                const stickGeometry = new THREE.CylinderGeometry(0.05, 0.05, 1.2, 8);
-                const stickMaterial = new THREE.MeshStandardMaterial({
-                    color: 0x8B4513,
-                    metalness: 0.3,
-                    roughness: 0.7
-                });
-                const stick = new THREE.Mesh(stickGeometry, stickMaterial);
-                stick.position.y = 0.6;
-                stick.castShadow = true;
-                
-                // 糖果顶部
-                const candyGeometry = new THREE.SphereGeometry(0.2, 16, 16);
-                const candyMaterial = new THREE.MeshStandardMaterial({
-                    color: 0xFF69B4,
-                    metalness: 0.5,
-                    roughness: 0.2,
-                    emissive: 0xFF69B4,
-                    emissiveIntensity: 0.3
-                });
-                const candy = new THREE.Mesh(candyGeometry, candyMaterial);
-                candy.position.y = 1.3;
-                candy.castShadow = true;
-                
-                group.add(stick);
-                group.add(candy);
-                group.position.set(x, y, z);
-                
-                return group;
-            }
-            
-            // 创建照片云
-            createPhotoCloud(x, y, z) {
-                const group = new THREE.Group();
-                
-                // 云朵基础
-                const cloudGeometry = new THREE.SphereGeometry(0.5, 16, 16);
-                const cloudMaterial = new THREE.MeshStandardMaterial({
-                    color: 0xFFFFFF,
-                    metalness: 0.1,
-                    roughness: 0.8,
-                    transparent: true,
-                    opacity: 0.7
-                });
-                const cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
-                cloud.castShadow = true;
-                
-                // 照片占位符（将被实际照片替换）
-                const photoGeometry = new THREE.PlaneGeometry(0.6, 0.8);
-                const photoMaterial = new THREE.MeshBasicMaterial({
-                    color: 0x333333,
-                    side: THREE.DoubleSide
-                });
-                const photo = new THREE.Mesh(photoGeometry, photoMaterial);
-                photo.position.z = 0.3;
-                photo.userData.isPhoto = true;
-                photo.userData.photoIndex = this.photoMeshes.length;
-                
-                group.add(cloud);
-                group.add(photo);
-                group.position.set(x, y, z);
-                
-                this.photoMeshes.push(photo);
-                
-                return group;
-            }
-            
-            // 创建星星
-            createStar(x, y, z) {
-                const starGeometry = new THREE.ConeGeometry(0.5, 1, 5);
-                const starMaterial = new THREE.MeshStandardMaterial({
-                    color: 0xFFD700,
-                    metalness: 0.9,
-                    roughness: 0.1,
-                    emissive: 0xFFD700,
-                    emissiveIntensity: 0.5
-                });
-                const star = new THREE.Mesh(starGeometry, starMaterial);
-                star.position.set(x, y, z);
-                star.castShadow = true;
-                return star;
-            }
-            
-            // 创建背景粒子
-            createParticles() {
-                const particleCount = 500;
-                const particles = new THREE.BufferGeometry();
-                const positions = new Float32Array(particleCount * 3);
-                const colors = new Float32Array(particleCount * 3);
-                
-                const color = new THREE.Color();
-                
-                for (let i = 0; i < particleCount; i++) {
-                    // 位置
-                    const i3 = i * 3;
-                    positions[i3] = (Math.random() - 0.5) * 50;
-                    positions[i3 + 1] = (Math.random() - 0.5) * 30;
-                    positions[i3 + 2] = (Math.random() - 0.5) * 50;
-                    
-                    // 颜色
-                    const colorChoice = Math.random();
-                    if (colorChoice < 0.33) {
-                        color.set(0x2F4F2F); // 哑光绿
-                    } else if (colorChoice < 0.66) {
-                        color.set(0xD4AF37); // 金属金
+
+            // ============ 渲染 ============
+            const YAO_LABELS = ['初爻', '二爻', '三爻', '四爻', '五爻', '上爻'];
+            const YAO_POSITION_NAMES = ['初', '二', '三', '四', '五', '上'];
+
+            function renderYaoSelector() {
+                yaoSelector.innerHTML = '';
+                // 从下往上显示：初爻(index 0)在最下面，上爻(index 5)在最上面
+                // UI中从上往下排列：上爻在最上面，初爻在最下面
+                for (let i = 5; i >= 0; i--) {
+                    const isYang = yaoValues[i];
+                    const positionName = YAO_POSITION_NAMES[i];
+                    const yaoName = isYang ? `九${positionName}` : `六${positionName}`;
+                    // 对于初爻和上爻，称谓略有不同
+                    let displayYaoName;
+                    if (i === 0) {
+                        displayYaoName = isYang ? '初九' : '初六';
+                    } else if (i === 5) {
+                        displayYaoName = isYang ? '上九' : '上六';
                     } else {
-                        color.set(0xB22222); // 圣诞红
+                        displayYaoName = yaoName;
                     }
-                    
-                    colors[i3] = color.r;
-                    colors[i3 + 1] = color.g;
-                    colors[i3 + 2] = color.b;
+
+                    const row = document.createElement('div');
+                    row.className = 'yao-row';
+                    row.setAttribute('data-index', i);
+                    row.innerHTML = `
+                        <span class="yao-label">${YAO_LABELS[i]}</span>
+                        <div class="yao-display">
+                            <span class="yao-symbol ${isYang ? 'yang' : 'yin'}">${isYang ? '━━━━━' : '━ ━ ━'}</span>
+                        </div>
+                        <span class="yao-indicator ${isYang ? 'active-yang' : 'active-yin'}">${displayYaoName}</span>
+                    `;
+                    row.addEventListener('click', () => {
+                        yaoValues[i] = !yaoValues[i];
+                        updateAll();
+                        // 添加微小的触觉反馈模拟
+                        row.style.transform = 'scale(0.94)';
+                        setTimeout(() => { row.style.transform = ''; }, 120);
+                    });
+                    yaoSelector.appendChild(row);
+
+                    // 在爻之间添加分隔线（除了最后一个即最上面的上爻之后）
+                    if (i > 0) {
+                        const divider = document.createElement('hr');
+                        divider.className = 'yao-divider';
+                        yaoSelector.appendChild(divider);
+                    }
                 }
-                
-                particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-                
-                const particleMaterial = new THREE.PointsMaterial({
-                    size: 0.1,
-                    vertexColors: true,
-                    transparent: true,
-                    opacity: 0.6
-                });
-                
-                this.particleSystem = new THREE.Points(particles, particleMaterial);
-                this.scene.add(this.particleSystem);
             }
-            
-            // 初始化MediaPipe Hands
-            initMediaPipe() {
-                const video = document.getElementById('video');
-                
-                // 获取摄像头访问权限
-                navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: 'user',
-                        width: { ideal: 640 },
-                        height: { ideal: 480 }
+
+            function renderHexagramVisual() {
+                hexagramVisual.innerHTML = '';
+                // 从下往上显示：初爻(index 0)在下，上爻(index 5)在上
+                // UI中从上往下排列
+                for (let i = 5; i >= 0; i--) {
+                    const isYang = yaoValues[i];
+                    const lineDiv = document.createElement('div');
+                    lineDiv.className = `hex-line ${isYang ? 'yang' : 'yin'}`;
+                    if (isYang) {
+                        lineDiv.innerHTML = `<span class="hex-line-label">${YAO_LABELS[i]}</span><div class="bar"></div>`;
+                    } else {
+                        lineDiv.innerHTML =
+                            `<span class="hex-line-label">${YAO_LABELS[i]}</span><div class="bar-left"></div><div class="gap"></div><div class="bar-right"></div>`;
                     }
-                }).then(stream => {
-                    video.srcObject = stream;
-                    
-                    // 初始化MediaPipe Hands
-                    this.hands = new Hands({
-                        locateFile: (file) => {
-                            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-                        }
-                    });
-                    
-                    this.hands.setOptions({
-                        maxNumHands: 1,
-                        modelComplexity: 1,
-                        minDetectionConfidence: 0.5,
-                        minTrackingConfidence: 0.5
-                    });
-                    
-                    this.hands.onResults(this.onHandResults.bind(this));
-                    
-                    // 开始发送视频帧给MediaPipe
-                    const camera = new Camera(video, {
-                        onFrame: async () => {
-                            await this.hands.send({ image: video });
+                    hexagramVisual.appendChild(lineDiv);
+                }
+            }
+
+            function renderResult() {
+                const guaData = getGuaInfo();
+                currentGuaKey = guaData.key;
+
+                if (guaData.info) {
+                    guaName.textContent = guaData.info.name;
+                    guaNumber.textContent = `周易第${guaData.info.order}卦`;
+                    guaTags.innerHTML = `
+                        <span class="gua-tag">上卦：${guaData.upperSymbol} ${guaData.upperName}(${guaData.upperElement})</span>
+                        <span class="gua-tag">下卦：${guaData.lowerSymbol} ${guaData.lowerName}(${guaData.lowerElement})</span>
+                    `;
+                    localInfo.textContent = guaData.info.desc;
+                    btnExplain.disabled = false;
+                } else {
+                    // 理论上不会出现，因为覆盖了64卦
+                    guaName.textContent = '未知卦象';
+                    guaNumber.textContent = '';
+                    guaTags.innerHTML = `
+                        <span class="gua-tag">上卦：${guaData.upperSymbol} ${guaData.upperName}</span>
+                        <span class="gua-tag">下卦：${guaData.lowerSymbol} ${guaData.lowerName}</span>
+                    `;
+                    localInfo.textContent = '（数据库未匹配到此卦象，请检查爻位设置）';
+                    btnExplain.disabled = true;
+                }
+                // 清除之前的AI解释
+                explanationBox.innerHTML =
+                    '<span style="color:var(--text-muted);">点击「AI 解卦」获取详细解释</span>';
+            }
+
+            function updateAll() {
+                renderYaoSelector();
+                renderHexagramVisual();
+                renderResult();
+            }
+
+            // ============ AI 解释 ============
+            async function fetchAIExplanation() {
+                if (isExplaining) return;
+                const guaData = getGuaInfo();
+                if (!guaData.info) {
+                    showToast('请先选择有效的卦象');
+                    return;
+                }
+
+                const settings = loadSettings();
+                if (!settings.apiKey || settings.apiKey.trim() === '') {
+                    showToast('请先在API设置中填入API Key');
+                    // 自动展开设置面板
+                    settingsPanel.classList.add('open');
+                    document.getElementById('apiKey').focus();
+                    return;
+                }
+
+                isExplaining = true;
+                btnExplain.disabled = true;
+                btnExplain.textContent = '⏳ 解读中...';
+                explanationBox.classList.add('loading');
+                explanationBox.innerHTML = '<span class="spinner"></span> AI正在解读卦象...';
+
+                const guaInfo = guaData.info;
+                const userPrompt = `请解读以下卦象：
+                卦名：${guaInfo.name}
+                周易序号：第${guaInfo.order}卦
+                上卦：${guaData.upperName}(${guaData.upperElement}) ${guaData.upperSymbol}
+                下卦：${guaData.lowerName}(${guaData.lowerElement}) ${guaData.lowerSymbol}
+                六爻（从下往上）：${yaoValues.map((y, i) => {
+                    const pos = YAO_POSITION_NAMES[i];
+                    if (i === 0) return y ? '初九' : '初六';
+                    if (i === 5) return y ? '上九' : '上六';
+                    return y ? `九${pos}` : `六${pos}`;
+                }).join('、')}
+                请直接输出简短解释。`;
+
+                const systemPrompt = settings.apiSystemPrompt || DEFAULT_SETTINGS.apiSystemPrompt;
+
+                try {
+                    const response = await fetch(`${settings.apiBase}/chat/completions`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${settings.apiKey}`,
                         },
-                        width: 640,
-                        height: 480
+                        body: JSON.stringify({
+                            model: settings.apiModel,
+                            messages: [
+                                { role: 'system', content: systemPrompt },
+                                { role: 'user', content: userPrompt },
+                            ],
+                            max_tokens: 400,
+                            temperature: 0.6,
+                        }),
                     });
-                    
-                    camera.start();
-                    
-                    // 隐藏加载界面
-                    setTimeout(() => {
-                        document.getElementById('loading').style.display = 'none';
-                    }, 1500);
-                    
-                }).catch(err => {
-                    console.error('摄像头访问失败:', err);
-                    document.getElementById('loading').innerHTML = 
-                        '<div style="color: #B22222;">摄像头访问被拒绝，请允许摄像头权限后刷新页面</div>';
-                });
-            }
-            
-            // MediaPipe Hands结果处理
-            onHandResults(results) {
-                if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
-                    return;
-                }
-                
-                const landmarks = results.multiHandLandmarks[0];
-                const handedness = results.multiHandedness[0].label;
-                
-                // 更新手势历史
-                this.updateGestureHistory(landmarks);
-                
-                // 检测手势并执行相应动作
-                this.detectGestures(landmarks, handedness);
-            }
-            
-            // 更新手势历史记录
-            updateGestureHistory(landmarks) {
-                // 记录手部关键点位置
-                const wrist = landmarks[0];
-                const middleFingerTip = landmarks[12];
-                
-                this.gestureHistory.push({
-                    time: Date.now(),
-                    wrist: { x: wrist.x, y: wrist.y, z: wrist.z },
-                    middleFingerTip: { x: middleFingerTip.x, y: middleFingerTip.y, z: middleFingerTip.z }
-                });
-                
-                // 保持历史记录长度
-                if (this.gestureHistory.length > this.gestureHistoryMax) {
-                    this.gestureHistory.shift();
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(
+                            errorData.error?.message || `API请求失败 (HTTP ${response.status})`
+                        );
+                    }
+
+                    const data = await response.json();
+                    const aiText = data.choices?.[0]?.message?.content || '（AI未返回有效内容）';
+
+                    explanationBox.classList.remove('loading');
+                    explanationBox.textContent = aiText;
+                    showToast('✅ AI解读完成');
+                } catch (error) {
+                    explanationBox.classList.remove('loading');
+                    explanationBox.innerHTML =
+                        `<span style="color:#c0392b;">❌ 解读失败：${escapeHTML(error.message)}</span>
+                        <br><span style="font-size:0.75rem;color:var(--text-muted);">请检查API设置是否正确（Key、Base URL、模型名称）</span>`;
+                    showToast('❌ AI解读失败，请检查API设置');
+                } finally {
+                    isExplaining = false;
+                    btnExplain.disabled = false;
+                    btnExplain.textContent = '🔮 AI 解卦';
                 }
             }
-            
-            // 检测手势
-            detectGestures(landmarks, handedness) {
-                // 获取关键点
-                const thumbTip = landmarks[4];
-                const indexTip = landmarks[8];
-                const middleTip = landmarks[12];
-                const ringTip = landmarks[16];
-                const pinkyTip = landmarks[20];
-                const wrist = landmarks[0];
-                
-                // 计算指尖到手腕的距离
-                const distanceToWrist = (tip) => {
-                    return Math.sqrt(
-                        Math.pow(tip.x - wrist.x, 2) + 
-                        Math.pow(tip.y - wrist.y, 2) + 
-                        Math.pow(tip.z - wrist.z, 2)
-                    );
+
+            function escapeHTML(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            // ============ 按钮事件 ============
+            btnExplain.addEventListener('click', fetchAIExplanation);
+
+            btnRandom.addEventListener('click', () => {
+                for (let i = 0; i < 6; i++) {
+                    yaoValues[i] = Math.random() > 0.5;
+                }
+                updateAll();
+                showToast('🎲 已随机生成卦象');
+            });
+
+            btnClear.addEventListener('click', () => {
+                yaoValues = [true, true, true, true, true, true];
+                updateAll();
+                showToast('↺ 已重置为乾为天');
+            });
+
+            btnFlipAll.addEventListener('click', () => {
+                for (let i = 0; i < 6; i++) {
+                    yaoValues[i] = !yaoValues[i];
+                }
+                updateAll();
+                showToast('⇄ 已全部翻转');
+            });
+
+            btnToggleSettings.addEventListener('click', () => {
+                settingsPanel.classList.toggle('open');
+                if (settingsPanel.classList.contains('open')) {
+                    const s = loadSettings();
+                    populateSettingsForm(s);
+                }
+            });
+
+            btnSaveSettings.addEventListener('click', () => {
+                const newSettings = {
+                    apiKey: document.getElementById('apiKey').value.trim(),
+                    apiBase: document.getElementById('apiBase').value.trim() || DEFAULT_SETTINGS.apiBase,
+                    apiModel: document.getElementById('apiModel').value.trim() || DEFAULT_SETTINGS.apiModel,
+                    apiSystemPrompt: document.getElementById('apiSystemPrompt').value.trim() || DEFAULT_SETTINGS
+                        .apiSystemPrompt,
                 };
-                
-                const thumbDistance = distanceToWrist(thumbTip);
-                const indexDistance = distanceToWrist(indexTip);
-                const middleDistance = distanceToWrist(middleTip);
-                const ringDistance = distanceToWrist(ringTip);
-                const pinkyDistance = distanceToWrist(pinkyTip);
-                
-                // 计算平均距离
-                const avgDistance = (indexDistance + middleDistance + ringDistance + pinkyDistance) / 4;
-                
-                // 手势1: 握拳（所有指尖靠近手腕）
-                if (thumbDistance < 0.15 && avgDistance < 0.15) {
-                    this.transitionToState(this.STATES.CLOSED);
-                }
-                // 手势2: 张开手掌（所有指尖远离手腕）
-                else if (thumbDistance > 0.25 && avgDistance > 0.25) {
-                    this.transitionToState(this.STATES.SCATTERED);
-                }
-                // 手势3: 抓取手势（拇指和食指靠近）
-                else {
-                    const thumbIndexDistance = Math.sqrt(
-                        Math.pow(thumbTip.x - indexTip.x, 2) + 
-                        Math.pow(thumbTip.y - indexTip.y, 2) + 
-                        Math.pow(thumbTip.z - indexTip.z, 2)
-                    );
-                    
-                    if (thumbIndexDistance < 0.05 && this.currentState === this.STATES.SCATTERED) {
-                        this.selectPhotoForZoom();
+                saveSettings(newSettings);
+                currentSettings = newSettings;
+                showToast('💾 设置已保存');
+                settingsPanel.classList.remove('open');
+            });
+
+            btnResetSettings.addEventListener('click', () => {
+                saveSettings(DEFAULT_SETTINGS);
+                currentSettings = { ...DEFAULT_SETTINGS };
+                populateSettingsForm(DEFAULT_SETTINGS);
+                showToast('↺ 已恢复默认设置');
+            });
+
+            // ============ 键盘快捷键 ============
+            document.addEventListener('keydown', (e) => {
+                // 数字键1-6切换对应爻位（1=初爻, 6=上爻）
+                if (e.key >= '1' && e.key <= '6' && !e.target.closest('input') && !e.target.closest(
+                        'textarea') && !e.target.closest('select')) {
+                    const index = parseInt(e.key) - 1; // 0-5，0=初爻
+                    yaoValues[index] = !yaoValues[index];
+                    updateAll();
+                    // 高亮对应行
+                    const row = yaoSelector.querySelector(`[data-index="${index}"]`);
+                    if (row) {
+                        row.style.background = 'rgba(201,169,110,0.15)';
+                        setTimeout(() => { row.style.background = ''; }, 200);
                     }
                 }
-                
-                // 手势4: 手旋转（在散开态下）
-                if (this.currentState === this.STATES.SCATTERED && this.gestureHistory.length >= 3) {
-                    const recent = this.gestureHistory[this.gestureHistory.length - 1];
-                    const older = this.gestureHistory[0];
-                    
-                    // 计算手部旋转角度
-                    const deltaX = recent.wrist.x - older.wrist.x;
-                    const deltaY = recent.wrist.y - older.wrist.y;
-                    
-                    this.targetCameraAngle.x += deltaX * 5;
-                    this.targetCameraAngle.y += deltaY * 3;
+                // R键随机
+                if (e.key === 'r' && !e.target.closest('input') && !e.target.closest('textarea') && !e.target
+                    .closest('select')) {
+                    btnRandom.click();
                 }
-            }
-            
-            // 选择照片进行放大
-            selectPhotoForZoom() {
-                if (this.photoMeshes.length === 0 || this.currentState === this.STATES.PHOTO_ZOOM) {
-                    return;
+                // Enter键触发AI解卦
+                if (e.key === 'Enter' && !e.target.closest('input') && !e.target.closest('textarea') && !e.target
+                    .closest('select') && !btnExplain.disabled && !isExplaining) {
+                    e.preventDefault();
+                    btnExplain.click();
                 }
-                
-                // 随机选择一张照片
-                const photoIndex = Math.floor(Math.random() * this.photoMeshes.length);
-                this.selectedPhoto = this.photoMeshes[photoIndex];
-                
-                // 如果有实际照片，显示它
-                if (this.photos[photoIndex]) {
-                    this.showPhotoZoom(this.photos[photoIndex]);
-                }
-                
-                this.transitionToState(this.STATES.PHOTO_ZOOM);
+            });
+
+            // ============ 初始化 ============
+            function init() {
+                updateAll();
+                // 初始显示乾为天
+                console.log('☯ 六爻占卜网站已就绪');
+                console.log('  快捷键：数字1-6切换爻位 | R随机 | Enter解卦');
+                console.log('  当前卦象：' + (getGuaInfo().info?.name || '未知'));
             }
-            
-            // 显示照片放大
-            showPhotoZoom(photoUrl) {
-                const photoFrame = document.getElementById('photo-frame');
-                const photoContent = document.getElementById('photo-content');
-                
-                photoContent.src = photoUrl;
-                photoFrame.style.display = 'block';
-                
-                // 居中显示
-                photoFrame.style.width = '70%';
-                photoFrame.style.height = '70%';
-                photoFrame.style.left = '15%';
-                photoFrame.style.top = '15%';
-            }
-            
-            // 关闭照片放大
-            closePhotoZoom() {
-                document.getElementById('photo-frame').style.display = 'none';
-                this.transitionToState(this.STATES.SCATTERED);
-            }
-            
-            // 状态过渡
-            transitionToState(newState) {
-                if (this.currentState === newState) return;
-                
-                this.previousState = this.currentState;
-                this.currentState = newState;
-                this.transitionProgress = 0;
-                
-                this.updateStateUI();
-            }
-            
-            // 更新状态UI
-            updateStateUI() {
-                const stateText = document.getElementById('state-text');
-                const currentStateDisplay = document.getElementById('current-state');
-                
-                let stateDescription = '';
-                let displayText = '';
-                
-                switch (this.currentState) {
-                    case this.STATES.CLOSED:
-                        stateDescription = '圣诞树合拢态：所有元素聚合为圣诞树圆锥体形状';
-                        displayText = '🎄 圣诞树形态';
-                        break;
-                    case this.STATES.SCATTERED:
-                        stateDescription = '散开态：所有元素在空间中无序漂浮、散落';
-                        displayText = '✨ 元素散开态';
-                        break;
-                    case this.STATES.PHOTO_ZOOM:
-                        stateDescription = '照片放大态：单张照片被放大显示，其他元素保持散开';
-                        displayText = '📸 照片查看模式';
-                        break;
-                }
-                
-                stateText.textContent = stateDescription;
-                currentStateDisplay.textContent = displayText;
-            }
-            
-            // 初始化事件监听器
-            initEventListeners() {
-                // 照片上传
-                document.getElementById('photo-upload').addEventListener('change', (e) => {
-                    const files = e.target.files;
-                    const photoCount = document.getElementById('photo-count');
-                    
-                    for (let i = 0; i < files.length; i++) {
-                        const file = files[i];
-                        if (!file.type.match('image.*')) continue;
-                        
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                            this.photos.push(event.target.result);
-                            photoCount.textContent = `已加载 ${this.photos.length} 张照片`;
-                            
-                            // 更新照片网格的纹理
-                            if (this.photoMeshes.length > 0) {
-                                const photoIndex = (this.photos.length - 1) % this.photoMeshes.length;
-                                const texture = new THREE.TextureLoader().load(event.target.result);
-                                this.photoMeshes[photoIndex].material.map = texture;
-                                this.photoMeshes[photoIndex].material.needsUpdate = true;
-                            }
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-                
-                // 关闭照片按钮
-                document.getElementById('close-photo').addEventListener('click', () => {
-                    this.closePhotoZoom();
-                });
-                
-                // 点击照片框外部关闭
-                document.getElementById('photo-frame').addEventListener('click', (e) => {
-                    if (e.target === document.getElementById('photo-frame')) {
-                        this.closePhotoZoom();
-                    }
-                });
-            }
-            
-            // 窗口大小调整处理
-            onWindowResize() {
-                this.camera.aspect = window.innerWidth / window.innerHeight;
-                this.camera.updateProjectionMatrix();
-                this.renderer.setSize(window.innerWidth, window.innerHeight);
-                this.composer.setSize(window.innerWidth, window.innerHeight);
-            }
-            
-            // 动画循环
-            animate() {
-                requestAnimationFrame(() => this.animate());
-                
-                // 更新过渡动画
-                if (this.transitionProgress < 1) {
-                    this.transitionProgress += 0.016 / this.transitionDuration; // 60fps
-                    if (this.transitionProgress > 1) this.transitionProgress = 1;
-                }
-                
-                // 更新元素位置
-                this.updateElementsPosition();
-                
-                // 更新相机角度
-                this.updateCamera();
-                
-                // 旋转粒子
-                if (this.particleSystem) {
-                    this.particleSystem.rotation.y += 0.001;
-                }
-                
-                // 渲染场景
-                this.composer.render();
-            }
-            
-            // 更新元素位置
-            updateElementsPosition() {
-                if (!this.treeElements) return;
-                
-                const t = this.transitionProgress;
-                const easeT = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; // 缓动函数
-                
-                this.treeElements.forEach(element => {
-                    let targetPosition;
-                    
-                    switch (this.currentState) {
-                        case this.STATES.CLOSED:
-                            targetPosition = element.userData.closedPosition;
-                            break;
-                        case this.STATES.SCATTERED:
-                        case this.STATES.PHOTO_ZOOM:
-                            targetPosition = element.userData.scatteredPosition;
-                            break;
-                    }
-                    
-                    // 对于选中的照片，在照片放大态时将其移到相机前方
-                    if (this.currentState === this.STATES.PHOTO_ZOOM && 
-                        this.selectedPhoto && 
-                        element === this.selectedPhoto.parent) {
-                        targetPosition = new THREE.Vector3(0, 0, -5);
-                    }
-                    
-                    // 插值位置
-                    element.position.lerp(targetPosition, easeT * 0.1);
-                    
-                    // 旋转元素
-                    if (this.currentState !== this.STATES.CLOSED) {
-                        element.rotation.x += element.userData.rotationSpeed.x;
-                        element.rotation.y += element.userData.rotationSpeed.y;
-                        element.rotation.z += element.userData.rotationSpeed.z;
-                    }
-                    
-                    // 轻微浮动效果
-                    if (this.currentState !== this.STATES.CLOSED) {
-                        const floatOffset = Math.sin(Date.now() * 0.001 + element.position.x) * 0.05;
-                        element.position.y += floatOffset;
-                    }
-                });
-            }
-            
-            // 更新相机
-            updateCamera() {
-                // 平滑相机角度
-                this.cameraAngle.x += (this.targetCameraAngle.x - this.cameraAngle.x) * 0.05;
-                this.cameraAngle.y += (this.targetCameraAngle.y - this.cameraAngle.y) * 0.05;
-                
-                // 根据状态设置相机位置
-                let targetCameraPosition;
-                let targetLookAt;
-                
-                switch (this.currentState) {
-                    case this.STATES.CLOSED:
-                        targetCameraPosition = new THREE.Vector3(
-                            15 * Math.sin(this.cameraAngle.x * 0.01),
-                            5 + this.cameraAngle.y * 0.5,
-                            15 * Math.cos(this.cameraAngle.x * 0.01)
-                        );
-                        targetLookAt = new THREE.Vector3(0, 0, 0);
-                        break;
-                        
-                    case this.STATES.SCATTERED:
-                        targetCameraPosition = new THREE.Vector3(
-                            20 * Math.sin(this.cameraAngle.x * 0.01),
-                            8 + this.cameraAngle.y * 0.5,
-                            20 * Math.cos(this.cameraAngle.x * 0.01)
-                        );
-                        targetLookAt = new THREE.Vector3(0, 0, 0);
-                        break;
-                        
-                    case this.STATES.PHOTO_ZOOM:
-                        targetCameraPosition = new THREE.Vector3(0, 0, 10);
-                        targetLookAt = new THREE.Vector3(0, 0, 0);
-                        break;
-                }
-                
-                // 平滑移动相机
-                this.camera.position.lerp(targetCameraPosition, 0.05);
-                this.camera.lookAt(targetLookAt);
-            }
-        }
-        
-        // 启动应用
-        window.addEventListener('DOMContentLoaded', () => {
-            new ChristmasTreeApp();
-        });
+
+            init();
+        })();
     </script>
 </body>
 </html>
