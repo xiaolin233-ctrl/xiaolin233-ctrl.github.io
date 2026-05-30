@@ -349,6 +349,20 @@
             margin-top: 14px;
         }
 
+        /* Domain buttons in modal */
+        .domain-btn {
+            border-radius: 20px !important;
+            padding: 6px 18px !important;
+            font-size: 0.82rem !important;
+            transition: all 0.25s !important;
+        }
+        .domain-btn.active {
+            background: rgba(201, 169, 110, 0.25) !important;
+            border-color: var(--gold) !important;
+            color: var(--gold-light) !important;
+            font-weight: 600;
+        }
+
         /* Local info */
         .local-info {
             margin-top: 12px;
@@ -624,7 +638,7 @@
             <label for="apiModel">模型名称</label>
             <input type="text" id="apiModel" value="deepseek-v4-pro">
             <label for="apiSystemPrompt">System Prompt (自定义指令)</label>
-            <input type="text" id="apiSystemPrompt" value="你是一位精通周易六十四卦的专家。请直接对以下卦象进行简短精炼的解释，涵盖卦名含义、核心寓意、对问卦者的启示。直接输出解释内容，不需要任何开场白、问候语或确认语句。控制在200字以内。">
+            <input type="text" id="apiSystemPrompt" value="你是一位精通周易六十四卦的专家。请直接对以下卦象进行简短精炼的解释，并针对用户指定的领域（如情感、事业等）给出针对性启示。直接输出解释内容，不需要任何开场白或确认语句。控制在250字以内。">
             <div class="btn-group" style="margin-top:12px;">
                 <button class="btn btn-sm" id="btnSaveSettings">💾 保存设置</button>
                 <button class="btn btn-sm" id="btnResetSettings">↺ 恢复默认</button>
@@ -639,9 +653,9 @@
     <div class="modal-overlay" id="explainModal">
         <div class="modal-content">
             <button class="modal-close" id="modalCloseBtn">&times;</button>
-            <div class="modal-title">🔮 AI 卦象解读</div>
+            <div class="modal-title" id="modalTitle">🔮 选择领域</div>
             <div class="modal-body" id="modalBody">
-                <!-- 动态内容 -->
+                <!-- 动态内容：领域选择 或 加载/结果 -->
             </div>
         </div>
     </div>
@@ -727,6 +741,7 @@
             let yaoValues = [true, true, true, true, true, true]; // 全阳
             let currentGuaKey = null;
             let isExplaining = false;
+            let currentDomain = '综合'; // 默认领域
 
             // ============ DOM引用 ============
             const yaoSelector = document.getElementById('yaoSelector');
@@ -747,13 +762,14 @@
             const explainModal = document.getElementById('explainModal');
             const modalBody = document.getElementById('modalBody');
             const modalCloseBtn = document.getElementById('modalCloseBtn');
+            const modalTitle = document.getElementById('modalTitle');
 
             // ============ 设置管理 (默认DeepSeek V4 Pro) ============
             const DEFAULT_SETTINGS = {
                 apiKey: '',
                 apiBase: 'https://api.deepseek.com',
                 apiModel: 'deepseek-v4-pro',
-                apiSystemPrompt: '你是一位精通周易六十四卦的专家。请直接对以下卦象进行简短精炼的解释，涵盖卦名含义、核心寓意、对问卦者的启示。直接输出解释内容，不需要任何开场白、问候语或确认语句。控制在200字以内。',
+                apiSystemPrompt: '你是一位精通周易六十四卦的专家。请直接对以下卦象进行简短精炼的解释，并针对用户指定的领域（如情感、事业等）给出针对性启示。直接输出解释内容，不需要任何开场白或确认语句。控制在250字以内。',
             };
 
             function loadSettings() {
@@ -792,18 +808,39 @@
             }
 
             // ============ 弹窗控制 ============
-            function openModal(content, isLoading = false) {
-                modalBody.innerHTML = content;
-                if (isLoading) {
-                    modalBody.classList.add('loading');
-                } else {
-                    modalBody.classList.remove('loading');
-                }
+            function showDomainSelection() {
+                modalTitle.textContent = '🔮 选择领域';
+                modalBody.classList.remove('loading');
+                modalBody.innerHTML = `
+                    <p style="text-align:center;margin-bottom:16px;color:var(--text-secondary);">请选择您关心的领域：</p>
+                    <div class="domain-options" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;">
+                        ${['情感', '事业', '健康', '学业', '综合'].map(d => {
+                            const activeClass = d === currentDomain ? ' active' : '';
+                            return `<button class="domain-btn btn btn-sm${activeClass}" data-domain="${d}">${d}</button>`;
+                        }).join('')}
+                    </div>
+                    <div style="text-align:center;">
+                        <button class="btn btn-primary" id="startInterpretBtn">开始解读</button>
+                    </div>
+                `;
+                // 绑定领域选择事件
+                const domainBtns = modalBody.querySelectorAll('.domain-btn');
+                domainBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        domainBtns.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentDomain = btn.dataset.domain;
+                    });
+                });
+                document.getElementById('startInterpretBtn').addEventListener('click', () => {
+                    startInterpretation();
+                });
                 explainModal.classList.add('active');
             }
 
             function closeModal() {
                 explainModal.classList.remove('active');
+                // 重置弹窗内容，下次打开会重新生成
                 setTimeout(() => {
                     if (!explainModal.classList.contains('active')) {
                         modalBody.innerHTML = '';
@@ -937,17 +974,18 @@
                 renderResult();
             }
 
-            // ============ AI 解卦（弹窗显示） ============
-            async function fetchAIExplanation() {
+            // ============ AI 解卦核心流程 ============
+            async function startInterpretation() {
                 if (isExplaining) return;
                 const guaData = getGuaInfo();
                 if (!guaData.info) {
-                    showToast('请先选择有效的卦象');
+                    showToast('无效卦象');
                     return;
                 }
                 const settings = loadSettings();
                 if (!settings.apiKey || settings.apiKey.trim() === '') {
-                    showToast('请先在API设置中填入API Key');
+                    showToast('请先设置API Key');
+                    closeModal();
                     settingsPanel.classList.add('open');
                     document.getElementById('apiKey').focus();
                     return;
@@ -956,10 +994,14 @@
                 isExplaining = true;
                 btnExplain.disabled = true;
                 btnExplain.textContent = '⏳ 解读中...';
-                openModal('<span class="spinner"></span> AI 正在解读卦象，请稍候...', true);
+
+                // 弹窗切换为加载状态
+                modalTitle.textContent = '🔮 AI 卦象解读';
+                modalBody.classList.add('loading');
+                modalBody.innerHTML = `<span class="spinner"></span> AI 正在解读“${currentDomain}”领域，请稍候...`;
 
                 const guaInfo = guaData.info;
-                const userPrompt = `请解读以下卦象：
+                const userPrompt = `请解读以下卦象，并重点关注“${currentDomain}”领域：
                 卦名：${guaInfo.name}
                 周易序号：第${guaInfo.order}卦
                 上卦：${guaData.upperName}(${guaData.upperElement}) ${guaData.upperSymbol}
@@ -970,7 +1012,7 @@
                     if (i === 5) return y ? '上九' : '上六';
                     return y ? `九${pos}` : `六${pos}`;
                 }).join('、')}
-                请直接输出简短解释。`;
+                请直接输出简短解释，无需开场白。`;
 
                 const systemPrompt = settings.apiSystemPrompt || DEFAULT_SETTINGS.apiSystemPrompt;
 
@@ -999,12 +1041,14 @@
 
                     const data = await response.json();
                     const aiText = data.choices?.[0]?.message?.content || '（AI未返回有效内容）';
-                    openModal(aiText, false);
+                    modalBody.classList.remove('loading');
+                    modalBody.textContent = aiText;
                     showToast('✅ AI解读完成');
                 } catch (error) {
-                    openModal(`<span style="color:#c0392b;">❌ 解读失败：${escapeHTML(error.message)}</span>
-                        <br><span style="font-size:0.8rem;color:var(--text-muted);">请检查API设置（Key、Base URL、模型名称）</span>`, false);
-                    showToast('❌ AI解读失败，请检查设置');
+                    modalBody.classList.remove('loading');
+                    modalBody.innerHTML = `<span style="color:#c0392b;">❌ 解读失败：${escapeHTML(error.message)}</span>
+                        <br><span style="font-size:0.8rem;color:var(--text-muted);">请检查API设置</span>`;
+                    showToast('❌ 解读失败');
                 } finally {
                     isExplaining = false;
                     btnExplain.disabled = false;
@@ -1018,8 +1062,18 @@
                 return div.innerHTML;
             }
 
-            // ============ 按钮事件 ============
-            btnExplain.addEventListener('click', fetchAIExplanation);
+            // 按钮事件：打开领域选择弹窗
+            btnExplain.addEventListener('click', () => {
+                if (isExplaining) return;
+                const guaData = getGuaInfo();
+                if (!guaData.info) {
+                    showToast('请先选择有效的卦象');
+                    return;
+                }
+                showDomainSelection();
+            });
+
+            // ============ 其他按钮事件 ============
             btnRandom.addEventListener('click', () => {
                 for (let i = 0; i < 6; i++) yaoValues[i] = Math.random() > 0.5;
                 updateAll();
@@ -1075,7 +1129,8 @@
                 if (e.key === 'r' && !e.target.closest('input, textarea, select')) {
                     btnRandom.click();
                 }
-                if (e.key === 'Enter' && !e.target.closest('input, textarea, select') && !btnExplain.disabled && !isExplaining) {
+                // Enter 键仅在弹窗关闭时触发打开弹窗
+                if (e.key === 'Enter' && !e.target.closest('input, textarea, select') && !btnExplain.disabled && !isExplaining && !explainModal.classList.contains('active')) {
                     e.preventDefault();
                     btnExplain.click();
                 }
@@ -1084,7 +1139,7 @@
             // ============ 初始化 ============
             updateAll();
             console.log('☯ 六爻占卜已就绪 (DeepSeek V4 Pro)');
-            console.log('  快捷键：数字1-6切换爻位 | R随机 | Enter解卦');
+            console.log('  快捷键：数字1-6切换爻位 | R随机 | Enter打开领域选择');
         })();
     </script>
 </body>
