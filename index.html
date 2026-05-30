@@ -58,6 +58,9 @@
         .spinner { display: inline-block; width:16px; height:16px; border:2px solid #3a3530; border-top-color: var(--gold); border-radius:50%; animation: spin 0.7s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .test-btn { font-size: 0.7rem; padding: 4px 10px; margin-left: 8px; }
+        .settings-row { margin-bottom: 8px; }
+        .settings-row input { width: 100%; padding: 6px; background: #1a1a1f; border: 1px solid #3a3530; color: #e8e0d5; border-radius: 6px; }
+        .settings-row label { font-size: 0.75rem; color: #7a7265; display: block; margin-bottom: 2px; }
     </style>
 </head>
 <body>
@@ -80,12 +83,22 @@
             <button class="btn btn-sm" id="btnSettings">⚙️ API设置</button>
         </div>
         <div id="settingsPanel" style="display:none;background:#2a2a33;padding:14px;border-radius:10px;margin-bottom:16px;">
-            <input type="password" id="apiKey" placeholder="DeepSeek API Key" style="width:100%;margin:4px 0;padding:6px;background:#1a1a1f;border:1px solid #3a3530;color:#e8e0d5;border-radius:6px;">
-            <div style="display:flex;align-items:center;">
-                <input type="text" id="apiModel" placeholder="模型名称" style="flex:1;margin:4px 0;padding:6px;background:#1a1a1f;border:1px solid #3a3530;color:#e8e0d5;border-radius:6px;">
-                <button class="btn test-btn" id="btnTest">测试连接</button>
+            <div class="settings-row">
+                <label>API Key</label>
+                <input type="password" id="apiKey" placeholder="sk-...">
             </div>
-            <button class="btn btn-sm" id="btnSave" style="margin-top:8px;">保存设置</button>
+            <div class="settings-row">
+                <label>API Base URL</label>
+                <input type="text" id="apiBase" placeholder="https://api.deepseek.com">
+            </div>
+            <div class="settings-row" style="display:flex;align-items:flex-end;gap:6px;">
+                <div style="flex:1;">
+                    <label>模型名称</label>
+                    <input type="text" id="apiModel" placeholder="deepseek-chat">
+                </div>
+                <button class="btn test-btn" id="btnTest" style="margin-bottom:0;">测试连接</button>
+            </div>
+            <button class="btn btn-sm" id="btnSave" style="margin-top:10px;width:100%;">保存设置</button>
         </div>
     </div>
 
@@ -99,7 +112,7 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // 完整六十四卦数据库（保持不变）
+        // 完整六十四卦数据库
         const GUA_DB = {
             '7-7':{n:'乾为天',o:1,d:'元亨利贞。天行健，君子以自强不息。'},
             '0-0':{n:'坤为地',o:2,d:'元亨，利牝马之贞。地势坤，君子以厚德载物。'},
@@ -239,15 +252,30 @@
             $('modal').classList.add('active');
         }
 
+        function getSettings() {
+            const defaults = {
+                apiKey: '',
+                apiBase: 'https://api.deepseek.com',
+                apiModel: 'deepseek-chat'
+            };
+            try {
+                return Object.assign(defaults, JSON.parse(localStorage.getItem(LS_KEY) || '{}'));
+            } catch(e) {
+                return defaults;
+            }
+        }
+
         async function testConnection() {
-            const key = $('apiKey').value.trim();
-            const model = $('apiModel').value.trim() || 'deepseek-chat';
+            const settings = getSettings();
+            const key = settings.apiKey;
+            const base = settings.apiBase || 'https://api.deepseek.com';
+            const model = settings.apiModel || 'deepseek-chat';
             if(!key) { showToast('请先填写API Key'); return; }
             const btn = $('btnTest');
             btn.disabled = true;
             btn.textContent = '测试中...';
             try {
-                const res = await fetch('https://api.deepseek.com/chat/completions', {
+                const res = await fetch(`${base}/chat/completions`, {
                     method: 'POST',
                     headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${key}` },
                     body: JSON.stringify({
@@ -275,27 +303,29 @@
         }
 
         async function startAI() {
-            const settings = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
-            if(!settings.apiKey) {
+            const settings = getSettings();
+            const key = settings.apiKey;
+            const base = settings.apiBase || 'https://api.deepseek.com';
+            const model = settings.apiModel || 'deepseek-chat';
+            if(!key) {
                 showToast('请先设置API Key');
                 $('modal').classList.remove('active');
                 return;
             }
             $('modalTitle').textContent = 'AI 解读中';
             $('modalBody').innerHTML = '<span class="spinner"></span> 正在分析...';
-            const key = getGuaKey();
-            const info = GUA_DB[key];
+            const key_gua = getGuaKey();
+            const info = GUA_DB[key_gua];
             const yaoNames = ['初','二','三','四','五','上'];
-            // 修改提示词，要求全面解读六爻，并结合领域
-            const prompt = `卦名：${info.n} (第${info.o}卦)。卦辞：${info.d}。领域：${domain}。六爻分别为：${yao.map((v,i)=>yaoNames[i]+(v?'九':'六')).join('、')}。请全面解读该卦象，涵盖六爻整体寓意，并结合【${domain}】领域给出针对性启示。请确保解读完整，不要只分析部分爻，解释需有条理且内容充实。`;
+            const prompt = `卦名：${info.n} (第${info.o}卦)。卦辞：${info.d}。领域：${domain}。六爻分别为：${yao.map((v,i)=>yaoNames[i]+(v?'九':'六')).join('、')}。请全面解读该卦象，涵盖六爻整体寓意，并结合【${domain}】领域给出针对性启示。要求：用清晰的分点形式（如1. 2. 3. ...）输出，每条要点完整，总字数约400字，避免只讲部分爻。`;
             try {
-                const res = await fetch('https://api.deepseek.com/chat/completions', {
+                const res = await fetch(`${base}/chat/completions`, {
                     method: 'POST',
-                    headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${settings.apiKey}` },
+                    headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${key}` },
                     body: JSON.stringify({
-                        model: settings.apiModel || 'deepseek-chat',
+                        model: model,
                         messages: [{ role:'user', content: prompt }],
-                        max_tokens: 600  // 增加最大令牌数，允许更长回复
+                        max_tokens: 800
                     })
                 });
 
@@ -311,7 +341,7 @@
                         <div style="color:#c0392b;">AI返回空内容</div>
                         <div style="margin-top:8px; font-size:0.8rem;">
                             可能原因：<br>
-                            1. 模型名称 <strong>"${settings.apiModel}"</strong> 无效<br>
+                            1. 模型名称 <strong>"${model}"</strong> 无效<br>
                             2. 账户余额不足或权限不足<br>
                             3. 建议尝试官方模型：<strong>deepseek-chat</strong> 或 <strong>deepseek-reasoner</strong>
                         </div>`;
@@ -323,7 +353,7 @@
             }
         }
 
-        // 按钮事件（保持不变）
+        // 按钮事件
         $('btnRandom').onclick = () => { yao = yao.map(()=>Math.random()>0.5?1:0); updateDisplay(); showToast('随机卦象'); };
         $('btnClear').onclick = () => { yao = [1,1,1,1,1,1]; updateDisplay(); showToast('重置为乾'); };
         $('btnFlipAll').onclick = () => { yao = yao.map(v=>v?0:1); updateDisplay(); showToast('全部翻转'); };
@@ -333,7 +363,11 @@
             p.style.display = p.style.display === 'none' ? 'block' : 'none';
         };
         $('btnSave').onclick = () => {
-            const s = { apiKey:$('apiKey').value, apiModel:$('apiModel').value };
+            const s = {
+                apiKey: $('apiKey').value.trim(),
+                apiBase: $('apiBase').value.trim() || 'https://api.deepseek.com',
+                apiModel: $('apiModel').value.trim() || 'deepseek-chat'
+            };
             localStorage.setItem(LS_KEY, JSON.stringify(s));
             showToast('设置已保存');
             $('settingsPanel').style.display = 'none';
@@ -345,8 +379,9 @@
 
         // 初始化
         (() => {
-            const s = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+            const s = getSettings();
             $('apiKey').value = s.apiKey || '';
+            $('apiBase').value = s.apiBase || 'https://api.deepseek.com';
             $('apiModel').value = s.apiModel || 'deepseek-chat';
             updateDisplay();
         })();
