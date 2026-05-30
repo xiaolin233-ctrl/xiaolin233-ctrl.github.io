@@ -57,6 +57,7 @@
         .toast.show { opacity: 1; }
         .spinner { display: inline-block; width:16px; height:16px; border:2px solid #3a3530; border-top-color: var(--gold); border-radius:50%; animation: spin 0.7s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .test-btn { font-size: 0.7rem; padding: 4px 10px; margin-left: 8px; }
     </style>
 </head>
 <body>
@@ -80,7 +81,10 @@
         </div>
         <div id="settingsPanel" style="display:none;background:#2a2a33;padding:14px;border-radius:10px;margin-bottom:16px;">
             <input type="password" id="apiKey" placeholder="DeepSeek API Key" style="width:100%;margin:4px 0;padding:6px;background:#1a1a1f;border:1px solid #3a3530;color:#e8e0d5;border-radius:6px;">
-            <input type="text" id="apiModel" value="deepseek-chat" placeholder="模型名称" style="width:100%;margin:4px 0;padding:6px;background:#1a1a1f;border:1px solid #3a3530;color:#e8e0d5;border-radius:6px;">
+            <div style="display:flex;align-items:center;">
+                <input type="text" id="apiModel" placeholder="模型名称" style="flex:1;margin:4px 0;padding:6px;background:#1a1a1f;border:1px solid #3a3530;color:#e8e0d5;border-radius:6px;">
+                <button class="btn test-btn" id="btnTest">测试连接</button>
+            </div>
             <button class="btn btn-sm" id="btnSave" style="margin-top:8px;">保存设置</button>
         </div>
     </div>
@@ -95,7 +99,7 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // 完整六十四卦数据库
+        // 完整六十四卦数据库（保持不变）
         const GUA_DB = {
             '7-7':{n:'乾为天',o:1,d:'元亨利贞。天行健，君子以自强不息。'},
             '0-0':{n:'坤为地',o:2,d:'元亨，利牝马之贞。地势坤，君子以厚德载物。'},
@@ -163,7 +167,7 @@
             '5-2':{n:'火水未济',o:64,d:'火在水上，事未完成。宜继续努力。'}
         };
 
-        let yao = [1,1,1,1,1,1]; // 1阳0阴
+        let yao = [1,1,1,1,1,1];
         let domain = '综合';
         const LS_KEY = 'liuyao';
         const $ = id => document.getElementById(id);
@@ -235,6 +239,41 @@
             $('modal').classList.add('active');
         }
 
+        async function testConnection() {
+            const key = $('apiKey').value.trim();
+            const model = $('apiModel').value.trim() || 'deepseek-chat';
+            if(!key) { showToast('请先填写API Key'); return; }
+            const btn = $('btnTest');
+            btn.disabled = true;
+            btn.textContent = '测试中...';
+            try {
+                const res = await fetch('https://api.deepseek.com/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${key}` },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [{ role:'user', content:'ping' }],
+                        max_tokens: 5
+                    })
+                });
+                if(!res.ok) {
+                    const e = await res.json().catch(()=>({}));
+                    throw new Error(e.error?.message || `HTTP ${res.status}`);
+                }
+                const data = await res.json();
+                if(data.choices?.[0]?.message?.content !== undefined) {
+                    showToast('✅ 连接成功！模型可用');
+                } else {
+                    showToast('⚠️ 连接成功，但返回内容为空，请检查模型名称');
+                }
+            } catch(e) {
+                showToast('❌ 测试失败：' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '测试连接';
+            }
+        }
+
         async function startAI() {
             const settings = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
             if(!settings.apiKey) {
@@ -247,7 +286,8 @@
             const key = getGuaKey();
             const info = GUA_DB[key];
             const yaoNames = ['初','二','三','四','五','上'];
-            const prompt = `卦：${info.n} (${info.d})，领域：${domain}，六爻：${yao.map((v,i)=>yaoNames[i]+(v?'九':'六')).join('、')}。请直接简短解释。`;
+            // 修改提示词，要求全面解读六爻，并结合领域
+            const prompt = `卦名：${info.n} (第${info.o}卦)。卦辞：${info.d}。领域：${domain}。六爻分别为：${yao.map((v,i)=>yaoNames[i]+(v?'九':'六')).join('、')}。请全面解读该卦象，涵盖六爻整体寓意，并结合【${domain}】领域给出针对性启示。请确保解读完整，不要只分析部分爻，解释需有条理且内容充实。`;
             try {
                 const res = await fetch('https://api.deepseek.com/chat/completions', {
                     method: 'POST',
@@ -255,7 +295,7 @@
                     body: JSON.stringify({
                         model: settings.apiModel || 'deepseek-chat',
                         messages: [{ role:'user', content: prompt }],
-                        max_tokens: 300
+                        max_tokens: 600  // 增加最大令牌数，允许更长回复
                     })
                 });
 
@@ -266,13 +306,24 @@
 
                 const data = await res.json();
                 const text = data.choices?.[0]?.message?.content;
-                $('modalBody').textContent = text || 'AI返回了空内容，请重试或检查模型名称';
+                if(!text || text.trim() === '') {
+                    $('modalBody').innerHTML = `
+                        <div style="color:#c0392b;">AI返回空内容</div>
+                        <div style="margin-top:8px; font-size:0.8rem;">
+                            可能原因：<br>
+                            1. 模型名称 <strong>"${settings.apiModel}"</strong> 无效<br>
+                            2. 账户余额不足或权限不足<br>
+                            3. 建议尝试官方模型：<strong>deepseek-chat</strong> 或 <strong>deepseek-reasoner</strong>
+                        </div>`;
+                } else {
+                    $('modalBody').textContent = text;
+                }
             } catch(e) {
                 $('modalBody').innerHTML = `<span style="color:#c0392b;">错误：${e.message}</span>`;
             }
         }
 
-        // 按钮事件
+        // 按钮事件（保持不变）
         $('btnRandom').onclick = () => { yao = yao.map(()=>Math.random()>0.5?1:0); updateDisplay(); showToast('随机卦象'); };
         $('btnClear').onclick = () => { yao = [1,1,1,1,1,1]; updateDisplay(); showToast('重置为乾'); };
         $('btnFlipAll').onclick = () => { yao = yao.map(v=>v?0:1); updateDisplay(); showToast('全部翻转'); };
@@ -287,6 +338,7 @@
             showToast('设置已保存');
             $('settingsPanel').style.display = 'none';
         };
+        $('btnTest').onclick = testConnection;
         $('modalClose').onclick = () => $('modal').classList.remove('active');
         $('modal').onclick = e => { if(e.target === $('modal')) $('modal').classList.remove('active'); };
         document.onkeydown = e => { if(e.key==='Escape') $('modal').classList.remove('active'); };
