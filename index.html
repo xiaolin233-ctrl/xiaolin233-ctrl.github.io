@@ -614,7 +614,7 @@
 
         <!-- Settings -->
         <div class="settings-toggle">
-            <button id="btnToggleSettings">⚙️ API 设置 (DeepSeek)</button>
+            <button id="btnToggleSettings">⚙️ API 设置 (DeepSeek V4 Pro)</button>
         </div>
         <div class="settings-panel" id="settingsPanel">
             <label for="apiKey">API Key</label>
@@ -622,7 +622,7 @@
             <label for="apiBase">API Base URL</label>
             <input type="text" id="apiBase" value="https://api.deepseek.com">
             <label for="apiModel">模型名称</label>
-            <input type="text" id="apiModel" value="deepseek-chat">
+            <input type="text" id="apiModel" value="deepseek-v4-pro">
             <label for="apiSystemPrompt">System Prompt (自定义指令)</label>
             <input type="text" id="apiSystemPrompt" value="你是一位精通周易六十四卦的专家。请直接对以下卦象进行简短精炼的解释，涵盖卦名含义、核心寓意、对问卦者的启示。直接输出解释内容，不需要任何开场白、问候语或确认语句。控制在200字以内。">
             <div class="btn-group" style="margin-top:12px;">
@@ -748,11 +748,11 @@
             const modalBody = document.getElementById('modalBody');
             const modalCloseBtn = document.getElementById('modalCloseBtn');
 
-            // ============ 设置管理 (默认DeepSeek) ============
+            // ============ 设置管理 (默认DeepSeek V4 Pro) ============
             const DEFAULT_SETTINGS = {
                 apiKey: '',
                 apiBase: 'https://api.deepseek.com',
-                apiModel: 'deepseek-chat',
+                apiModel: 'deepseek-v4-pro',
                 apiSystemPrompt: '你是一位精通周易六十四卦的专家。请直接对以下卦象进行简短精炼的解释，涵盖卦名含义、核心寓意、对问卦者的启示。直接输出解释内容，不需要任何开场白、问候语或确认语句。控制在200字以内。',
             };
 
@@ -804,7 +804,6 @@
 
             function closeModal() {
                 explainModal.classList.remove('active');
-                // 延迟清除内容避免关闭动画时看到空白
                 setTimeout(() => {
                     if (!explainModal.classList.contains('active')) {
                         modalBody.innerHTML = '';
@@ -948,7 +947,7 @@
                 }
                 const settings = loadSettings();
                 if (!settings.apiKey || settings.apiKey.trim() === '') {
-                    showToast('请先在API设置中填入DeepSeek API Key');
+                    showToast('请先在API设置中填入API Key');
                     settingsPanel.classList.add('open');
                     document.getElementById('apiKey').focus();
                     return;
@@ -957,8 +956,6 @@
                 isExplaining = true;
                 btnExplain.disabled = true;
                 btnExplain.textContent = '⏳ 解读中...';
-
-                // 打开弹窗并显示加载状态
                 openModal('<span class="spinner"></span> AI 正在解读卦象，请稍候...', true);
 
                 const guaInfo = guaData.info;
@@ -1086,7 +1083,7 @@
 
             // ============ 初始化 ============
             updateAll();
-            console.log('☯ 六爻占卜已就绪 (DeepSeek)');
+            console.log('☯ 六爻占卜已就绪 (DeepSeek V4 Pro)');
             console.log('  快捷键：数字1-6切换爻位 | R随机 | Enter解卦');
         })();
     </script>
