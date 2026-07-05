@@ -30,16 +30,33 @@
         }
         .yao-selector { display: flex; flex-direction: column; align-items: center; gap: 2px; }
         .yao-row {
-            display: flex; align-items: center; gap: 10px; width: 100%;
-            padding: 8px 12px; border-radius: 16px; cursor: pointer;
+            display: flex; align-items: center; gap: 8px; width: 100%;
+            padding: 6px 10px; border-radius: 16px; cursor: pointer;
             transition: all 0.2s; user-select: none; background: transparent;
         }
         .yao-row:hover { background: rgba(255,255,255,0.4); }
         .yao-label { width: 38px; font-size: 0.75rem; color: #9b8c7c; text-align: right; font-weight: 500; }
-        .yao-symbol { flex: 1; text-align: center; font-size: 1.5rem; font-weight: 600; }
-        .yao-symbol.yang { color: #b8956a; }
-        .yao-symbol.yin { color: #7a8b9e; }
-        .yao-indicator { width: 40px; font-size: 0.75rem; color: #5e4b3c; font-weight: 600; }
+        .yao-symbol { flex: 1; text-align: center; font-size: 1.5rem; font-weight: 600; position: relative; }
+        .yao-symbol .main { display: inline; }
+        .yao-symbol .change-mark {
+            font-size: 1.0rem; vertical-align: super; margin-left: 2px; font-weight: bold;
+        }
+        .yao-symbol.yang .main { color: #b8956a; }
+        .yao-symbol.yin .main { color: #7a8b9e; }
+        .yao-symbol.moving .change-mark { color: #c0392b; }
+        .yao-indicator { width: 50px; font-size: 0.75rem; color: #5e4b3c; font-weight: 600; }
+        .move-btn {
+            width: 26px; height: 26px; border-radius: 13px;
+            background: rgba(255,255,255,0.4); border: 1px solid rgba(0,0,0,0.1);
+            font-size: 0.7rem; font-weight: 600; color: #5e4b3c;
+            cursor: pointer; transition: 0.2s; display: flex;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            margin-left: 2px;
+        }
+        .move-btn:hover { background: rgba(255,255,255,0.7); }
+        .move-btn:active { transform: scale(0.9); }
+        .move-btn.active { background: rgba(184,148,62,0.3); border-color: rgba(184,148,62,0.5); color: #b8956a; }
         .gua-name { text-align: center; font-size: 1.5rem; font-weight: 700; color: #5e4b3c; margin: 12px 0 6px; }
         .gua-tags { text-align: center; font-size: 0.8rem; color: #8b7b6b; margin-bottom: 12px; }
         .btn {
@@ -56,7 +73,6 @@
         .btn-primary:hover { background: rgba(184,148,62,1); }
         .btn-primary:disabled { opacity: 0.5; pointer-events: none; background: rgba(184,148,62,0.5); }
         .btn-group { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
-        /* 弹窗滚动 */
         .modal-overlay {
             position: fixed; top:0; left:0; width:100%; height:100%;
             background: rgba(0,0,0,0.2); backdrop-filter: blur(6px);
@@ -108,39 +124,27 @@
 <body>
     <div class="container">
         <div class="header">☯ 六爻占卜</div>
-
         <div class="card">
             <div class="yao-selector" id="yaoSelector"></div>
             <div class="btn-group">
                 <button class="btn btn-sm" id="btnRandom">🎲随机</button>
                 <button class="btn btn-sm" id="btnClear">↺重置</button>
-                <button class="btn btn-sm" id="btnFlipAll">⇄翻转</button>
+                <button class="btn btn-sm" id="btnFlipMove">⇄动静互换</button>
             </div>
         </div>
-
         <div class="card" style="text-align:center;">
             <div class="gua-name" id="guaName">—</div>
             <div class="gua-tags" id="guaTags"></div>
             <button class="btn btn-primary" id="btnExplain" disabled>🔮 AI 解卦</button>
         </div>
-
         <div style="text-align:center;">
             <button class="btn btn-sm" id="btnSettings" style="background: rgba(255,255,255,0.3);">⚙️ API</button>
         </div>
         <div class="card" id="settingsPanel" style="display:none;">
-            <div class="settings-row">
-                <label>API Key</label>
-                <input type="password" id="apiKey" placeholder="sk-...">
-            </div>
-            <div class="settings-row">
-                <label>API Base URL</label>
-                <input type="text" id="apiBase" placeholder="https://api.deepseek.com">
-            </div>
+            <div class="settings-row"><label>API Key</label><input type="password" id="apiKey" placeholder="sk-..."></div>
+            <div class="settings-row"><label>API Base URL</label><input type="text" id="apiBase" placeholder="https://api.deepseek.com"></div>
             <div class="settings-row" style="display:flex;align-items:flex-end;gap:6px;">
-                <div style="flex:1;">
-                    <label>模型</label>
-                    <input type="text" id="apiModel" placeholder="deepseek-chat">
-                </div>
+                <div style="flex:1;"><label>模型</label><input type="text" id="apiModel" placeholder="deepseek-chat"></div>
                 <button class="btn" id="btnTest" style="padding:8px 12px;font-size:0.7rem;">测试</button>
             </div>
             <button class="btn btn-primary" id="btnSave" style="width:100%;margin-top:8px;">保存</button>
@@ -224,142 +228,144 @@
             '5-2':{n:'火水未济',o:64,d:'火在水上，事未完成。宜继续努力。'}
         };
 
-        let yao = [1,1,1,1,1,1]; // 0初爻…5上爻
+        // 0=静阴, 1=静阳, 2=阳动, 3=阴动
+        let yao = [1,1,1,1,1,1];
         let domain = '综合';
-        let lengthMode = 'medium'; // 简短/标准/详细
+        let lengthMode = '标准';
         const LS_KEY = 'liuyao';
         const $ = id => document.getElementById(id);
         const toast = $('toast');
 
         function showToast(m) { toast.textContent=m; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),2000); }
 
-        function getGuaKey() {
-            const lower = (yao[0]?4:0) + (yao[1]?2:0) + (yao[2]?1:0);
-            const upper = (yao[3]?4:0) + (yao[4]?2:0) + (yao[5]?1:0);
-            return `${upper}-${lower}`;
+        function getGuaKeys() {
+            let origL=0, origU=0, chL=0, chU=0;
+            for(let i=0;i<6;i++){
+                const st=yao[i];
+                const isYang = (st===1||st===2);
+                const willYang = (st===1||st===3);
+                const w = (i%3===0)?4:(i%3===1)?2:1;
+                if(i<3){ if(isYang) origL+=w; if(willYang) chL+=w; }
+                else { if(isYang) origU+=w; if(willYang) chU+=w; }
+            }
+            return { origKey:`${origU}-${origL}`, changedKey:`${chU}-${chL}` };
+        }
+
+        function getMovingDescs() {
+            const n=['初','二','三','四','五','上'];
+            return yao.map((s,i)=>s===2?n[i]+'阳动':s===3?n[i]+'阴动':null).filter(Boolean).join('、')||'无';
         }
 
         function updateDisplay() {
-            const yaoNames = ['初','二','三','四','五','上'];
-            const sel = $('yaoSelector');
-            sel.innerHTML = '';
-            for(let i=5;i>=0;i--) {
-                const yang = yao[i];
-                const label = yaoNames[i]+'爻';
+            const n=['初','二','三','四','五','上'];
+            const sel=$('yaoSelector'); sel.innerHTML='';
+            for(let i=5;i>=0;i--){
+                const st=yao[i];
+                let css='', sym='';
+                if(st===0){ css='yin'; sym='━ ━ ━'; }
+                else if(st===1){ css='yang'; sym='━━━━━'; }
+                else if(st===2){ css='yang moving'; sym='━━━━━○'; }
+                else if(st===3){ css='yin moving'; sym='━ ━ ━×'; }
+                const isYang=(st===1||st===2);
                 let name;
-                if(i===0) name = yang?'初九':'初六';
-                else if(i===5) name = yang?'上九':'上六';
-                else { const mid=['二','三','四','五']; name = yang?'九'+mid[i-1]:'六'+mid[i-1]; }
-                const row = document.createElement('div');
-                row.className = 'yao-row';
-                row.innerHTML = `<span class="yao-label">${label}</span><span class="yao-symbol ${yang?'yang':'yin'}">${yang?'━━━━━':'━ ━ ━'}</span><span class="yao-indicator">${name}</span>`;
-                row.onclick = () => { yao[i] = yao[i]?0:1; updateDisplay(); };
+                if(i===0) name=isYang?'初九':'初六';
+                else if(i===5) name=isYang?'上九':'上六';
+                else { const m=['二','三','四','五']; name=isYang?'九'+m[i-1]:'六'+m[i-1]; }
+                if(st===2||st===3) name+='(动)';
+                const row=document.createElement('div');
+                row.className='yao-row';
+                row.innerHTML = `<span class="yao-label">${n[i]}爻</span>
+                    <span class="yao-symbol ${css}">${sym}</span>
+                    <span class="yao-indicator">${name}</span>
+                    <button class="move-btn ${(st===2||st===3)?'active':''}" data-idx="${i}">变</button>`;
+                // 点击行切换阴阳
+                row.addEventListener('click', (e) => {
+                    if(e.target.classList.contains('move-btn')) return;
+                    if(st===0||st===2) yao[i] = (st===0?1:3); // 阴变阳（静阴变静阳，阴动变阳动）
+                    else yao[i] = (st===1?0:2); // 阳变阴
+                    updateDisplay();
+                });
+                // 变按钮切换动静
+                row.querySelector('.move-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if(st===0) yao[i]=2; // 静阴变阳动
+                    else if(st===1) yao[i]=3; // 静阳变阴动
+                    else if(st===2) yao[i]=0; // 阳动变静阴
+                    else yao[i]=1; // 阴动变静阳
+                    updateDisplay();
+                });
                 sel.appendChild(row);
             }
-            const key = getGuaKey();
-            const info = GUA_DB[key];
-            $('guaName').textContent = info ? info.n : '未知卦象';
-            $('guaTags').innerHTML = info ? `第${info.o}卦 · ${info.d}` : '';
-            $('btnExplain').disabled = !info;
+            const {origKey, changedKey}=getGuaKeys();
+            const oi=GUA_DB[origKey], ci=GUA_DB[changedKey];
+            if(oi&&ci){
+                $('guaName').textContent = origKey===changedKey ? oi.n : `${oi.n} → ${ci.n}`;
+                $('guaTags').innerHTML = origKey===changedKey ? `第${oi.o}卦 · ${oi.d}` : `本卦第${oi.o}卦，变卦第${ci.o}卦`;
+                $('btnExplain').disabled=false;
+            } else { $('guaName').textContent='未知'; $('guaTags').innerHTML=''; $('btnExplain').disabled=true; }
         }
 
         function showDomainModal() {
-            $('modalTitle').textContent = '选择领域与长度';
-            $('modalBody').innerHTML = `
-                <div style="margin-bottom:12px;text-align:center;font-size:0.8rem;color:#7a6e60;">领域</div>
-                <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
-                    ${['情感','事业','健康','学业','综合'].map(d => `<button class="domain-btn btn ${d===domain?'active':''}" data-d="${d}">${d}</button>`).join('')}
-                </div>
-                <div style="margin:18px 0 8px;text-align:center;font-size:0.8rem;color:#7a6e60;">解释长度</div>
-                <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
-                    ${['简短','标准','详细'].map(m => `<button class="length-btn btn ${m===lengthMode?'active':''}" data-len="${m}">${m}</button>`).join('')}
-                </div>
-                <div style="text-align:center;margin-top:20px;">
-                    <button class="btn btn-primary" id="startBtn">开始解读</button>
-                </div>`;
-            // 领域绑定
-            $('modalBody').querySelectorAll('.domain-btn').forEach(b => {
-                b.onclick = function() {
-                    $('modalBody').querySelectorAll('.domain-btn').forEach(x => x.classList.remove('active'));
-                    this.classList.add('active');
-                    domain = this.dataset.d;
-                };
-            });
-            // 长度绑定
-            $('modalBody').querySelectorAll('.length-btn').forEach(b => {
-                b.onclick = function() {
-                    $('modalBody').querySelectorAll('.length-btn').forEach(x => x.classList.remove('active'));
-                    this.classList.add('active');
-                    lengthMode = this.dataset.len;
-                };
-            });
-            $('modalBody').querySelector('#startBtn').onclick = startAI;
+            $('modalTitle').textContent='选择领域与长度';
+            $('modalBody').innerHTML=`
+                <div style="margin-bottom:12px;text-align:center;font-size:0.8rem;">领域</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">${['情感','事业','健康','学业','综合'].map(d=>`<button class="domain-btn btn ${d===domain?'active':''}" data-d="${d}">${d}</button>`).join('')}</div>
+                <div style="margin:18px 0 8px;text-align:center;font-size:0.8rem;">长度</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">${['简短','标准','详细'].map(m=>`<button class="length-btn btn ${m===lengthMode?'active':''}" data-len="${m}">${m}</button>`).join('')}</div>
+                <div style="text-align:center;margin-top:20px;"><button class="btn btn-primary" id="startBtn">开始解读</button></div>`;
+            $('modalBody').querySelectorAll('.domain-btn').forEach(b=>b.onclick=function(){ $('modalBody').querySelectorAll('.domain-btn').forEach(x=>x.classList.remove('active')); this.classList.add('active'); domain=this.dataset.d; });
+            $('modalBody').querySelectorAll('.length-btn').forEach(b=>b.onclick=function(){ $('modalBody').querySelectorAll('.length-btn').forEach(x=>x.classList.remove('active')); this.classList.add('active'); lengthMode=this.dataset.len; });
+            $('modalBody').querySelector('#startBtn').onclick=startAI;
             $('modal').classList.add('active');
         }
 
-        function getSettings() {
-            const def = {apiKey:'', apiBase:'https://api.deepseek.com', apiModel:'deepseek-chat'};
-            try { return Object.assign(def, JSON.parse(localStorage.getItem(LS_KEY)||'{}')); } catch(e) { return def; }
-        }
+        function getSettings(){ const d={apiKey:'',apiBase:'https://api.deepseek.com',apiModel:'deepseek-chat'}; try{return Object.assign(d,JSON.parse(localStorage.getItem(LS_KEY)||'{}'));}catch(e){return d;} }
 
-        async function testConnection() {
-            const s = getSettings();
-            if(!s.apiKey) { showToast('请填写API Key'); return; }
-            const btn = $('btnTest'); btn.disabled = true; btn.textContent = '测试中';
-            try {
-                const res = await fetch(`${s.apiBase}/chat/completions`, {
-                    method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${s.apiKey}`},
-                    body: JSON.stringify({model:s.apiModel, messages:[{role:'user',content:'ping'}], max_tokens:5})
-                });
-                if(!res.ok) throw new Error((await res.json().catch(()=>({}))).error?.message || `HTTP ${res.status}`);
+        async function testConnection(){
+            const s=getSettings(); if(!s.apiKey){showToast('请填写Key');return;}
+            const btn=$('btnTest'); btn.disabled=true; btn.textContent='测试中';
+            try{
+                const r=await fetch(`${s.apiBase}/chat/completions`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${s.apiKey}`},body:JSON.stringify({model:s.apiModel,messages:[{role:'user',content:'ping'}],max_tokens:5})});
+                if(!r.ok) throw new Error((await r.json().catch(()=>({}))).error?.message||`HTTP ${r.status}`);
                 showToast('✅ 连接成功');
-            } catch(e) { showToast('❌ '+e.message); }
-            finally { btn.disabled = false; btn.textContent = '测试'; }
+            }catch(e){showToast('❌ '+e.message);}
+            finally{btn.disabled=false;btn.textContent='测试';}
         }
 
-        async function startAI() {
-            const s = getSettings();
-            if(!s.apiKey) { showToast('请设置API Key'); $('modal').classList.remove('active'); return; }
-            $('modalTitle').textContent = 'AI 解读中';
-            $('modalBody').innerHTML = '<span class="spinner"></span> 分析中...';
-            const info = GUA_DB[getGuaKey()];
-            const yaoNames = ['初','二','三','四','五','上'];
-            // 根据长度模式设定字数与tokens
-            let wordCount, maxTokens;
-            if(lengthMode === '简短') { wordCount = '约100字'; maxTokens = 300; }
-            else if(lengthMode === '详细') { wordCount = '约500字'; maxTokens = 1200; }
-            else { wordCount = '约300字'; maxTokens = 800; } // 标准
-            const prompt = `卦：${info.n}（第${info.o}卦），卦辞：${info.d}。六爻（从下往上）：${yao.map((v,i)=>yaoNames[i]+(v?'九':'六')).join('、')}。请直接给出针对【${domain}】的解读与建议，${wordCount}。`;
-            try {
-                const res = await fetch(`${s.apiBase}/chat/completions`, {
-                    method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${s.apiKey}`},
-                    body: JSON.stringify({model:s.apiModel, messages:[{role:'user',content:prompt}], max_tokens:maxTokens})
-                });
-                if(!res.ok) throw new Error((await res.json().catch(()=>({}))).error?.message || `HTTP ${res.status}`);
-                const data = await res.json();
-                $('modalBody').textContent = data.choices?.[0]?.message?.content || 'AI未返回内容';
-            } catch(e) { $('modalBody').innerHTML = `<span style="color:#c0392b;">错误：${e.message}</span>`; }
+        async function startAI(){
+            const s=getSettings(); if(!s.apiKey){showToast('请设置Key');$('modal').classList.remove('active');return;}
+            $('modalTitle').textContent='解读中'; $('modalBody').innerHTML='<span class="spinner"></span> 分析中...';
+            const {origKey,changedKey}=getGuaKeys();
+            const oi=GUA_DB[origKey], ci=GUA_DB[changedKey];
+            const md=getMovingDescs();
+            let wc,mt;
+            if(lengthMode==='简短'){wc='约120字';mt=400;}
+            else if(lengthMode==='详细'){wc='约500字';mt=1200;}
+            else{wc='约300字';mt=800;}
+            const prompt=origKey===changedKey?`卦：${oi.n}（第${oi.o}卦），无动爻。请针对【${domain}】解读，${wc}。`:
+                `本卦：${oi.n}（第${oi.o}卦），变卦：${ci.n}（第${ci.o}卦）。动爻：${md}。请结合动变解读，针对【${domain}】给出启示，${wc}。`;
+            try{
+                const r=await fetch(`${s.apiBase}/chat/completions`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${s.apiKey}`},body:JSON.stringify({model:s.apiModel,messages:[{role:'user',content:prompt}],max_tokens:mt})});
+                if(!r.ok) throw new Error((await r.json().catch(()=>({}))).error?.message||`HTTP ${r.status}`);
+                const d=await r.json();
+                $('modalBody').textContent = d.choices?.[0]?.message?.content||'无内容';
+            }catch(e){$('modalBody').innerHTML=`<span style="color:#c0392b;">错误：${e.message}</span>`;}
         }
 
-        $('btnRandom').onclick = () => { yao = yao.map(()=>Math.random()>0.5?1:0); updateDisplay(); };
-        $('btnClear').onclick = () => { yao = [1,1,1,1,1,1]; updateDisplay(); };
-        $('btnFlipAll').onclick = () => { yao = yao.map(v=>v?0:1); updateDisplay(); };
-        $('btnExplain').onclick = showDomainModal;
-        $('btnSettings').onclick = () => { const p = $('settingsPanel'); p.style.display = p.style.display==='none'?'block':'none'; };
-        $('btnSave').onclick = () => {
-            localStorage.setItem(LS_KEY, JSON.stringify({apiKey:$('apiKey').value, apiBase:$('apiBase').value, apiModel:$('apiModel').value}));
-            showToast('已保存'); $('settingsPanel').style.display='none';
-        };
-        $('btnTest').onclick = testConnection;
-        $('modalClose').onclick = () => $('modal').classList.remove('active');
-        $('modal').onclick = e => { if(e.target === $('modal')) $('modal').classList.remove('active'); };
-        document.onkeydown = e => { if(e.key==='Escape') $('modal').classList.remove('active'); };
+        $('btnRandom').onclick=()=>{yao=yao.map(()=>Math.floor(Math.random()*4)); updateDisplay();};
+        $('btnClear').onclick=()=>{yao=[1,1,1,1,1,1]; updateDisplay();};
+        $('btnFlipMove').onclick=()=>{yao=yao.map(v=>v<2?v+2:v-2); updateDisplay();}; // 动静互换
+        $('btnExplain').onclick=showDomainModal;
+        $('btnSettings').onclick=()=>{const p=$('settingsPanel');p.style.display=p.style.display==='none'?'block':'none';};
+        $('btnSave').onclick=()=>{localStorage.setItem(LS_KEY,JSON.stringify({apiKey:$('apiKey').value,apiBase:$('apiBase').value,apiModel:$('apiModel').value}));showToast('已保存');$('settingsPanel').style.display='none';};
+        $('btnTest').onclick=testConnection;
+        $('modalClose').onclick=()=>$('modal').classList.remove('active');
+        $('modal').onclick=e=>{if(e.target===$('modal'))$('modal').classList.remove('active');};
+        document.onkeydown=e=>{if(e.key==='Escape')$('modal').classList.remove('active');};
 
-        (() => {
-            const s = getSettings();
-            $('apiKey').value = s.apiKey;
-            $('apiBase').value = s.apiBase;
-            $('apiModel').value = s.apiModel;
+        (()=>{
+            const s=getSettings();
+            $('apiKey').value=s.apiKey;$('apiBase').value=s.apiBase;$('apiModel').value=s.apiModel;
             updateDisplay();
         })();
     </script>
